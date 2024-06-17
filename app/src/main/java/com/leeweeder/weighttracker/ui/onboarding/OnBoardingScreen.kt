@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.leeweeder.weighttracker.ui.components.NumberKeyBoard
 import com.leeweeder.weighttracker.ui.components.rememberNumberKeyBoardState
+import com.leeweeder.weighttracker.util.MAX_WEIGHT
 
 @Composable
 fun OnBoardingScreen() {
@@ -34,8 +35,7 @@ fun OnBoardingScreen() {
                     .padding(horizontal = outsidePadding)
                     .padding(bottom = outsidePadding)
                     .align(Alignment.BottomCenter)
-            ) {
-            }
+            )
         }
     }
 }
