@@ -35,6 +35,11 @@ fun Instant.getDatePickerCompatibleFormat(): Instant {
     return Instant.ofEpochMilli(calendar.timeInMillis)
 }
 
-fun Double.formatToTwoDecimalPlaces(): String {
-    return String.format(locale = Locale.getDefault(), format = "%.2f", this)
+fun Double.formatToTwoDecimalPlaces(showTrailingZero: Boolean = true): String {
+    val formatted = String.format(locale = Locale.getDefault(), format = "%.2f", this)
+    if (!showTrailingZero) {
+        return formatted.trimEnd('0').trimEnd('.')
+    }
+
+    return formatted
 }
