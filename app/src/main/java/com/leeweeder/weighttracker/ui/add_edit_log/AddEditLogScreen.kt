@@ -191,11 +191,13 @@ internal fun AddEditLogScreen(
                             }
                         }
                     }, navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.close),
-                                contentDescription = "Close add edit screen"
-                            )
+                        if (!isFromSetGoalWeightScreen) {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.close),
+                                    contentDescription = "Close add edit screen"
+                                )
+                            }
                         }
                     })
             }
