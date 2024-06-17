@@ -2,6 +2,7 @@ package com.leeweeder.weighttracker.ui.onboarding
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,7 +13,7 @@ import com.leeweeder.weighttracker.ui.components.rememberNumberKeyBoardState
 
 @Composable
 fun OnBoardingScreen() {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
         Text(text = "Set your goal!")
 
         val numberKeyBoardState = rememberNumberKeyBoardState(defaultValue = "0")
