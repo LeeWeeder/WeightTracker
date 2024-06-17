@@ -42,8 +42,8 @@ inline fun <reified T : Number> String.toTypeOrNull(): T? {
 
 @Composable
 fun rememberNumberKeyBoardState(
-    defaultValue: String,
-    maxValue: Double?
+    defaultValue: String = "0",
+    maxValue: Double? = null
 ): NumberKeyBoardState {
     requireConvertibleTo<Double>(defaultValue)
     return remember {
@@ -52,8 +52,8 @@ fun rememberNumberKeyBoardState(
 }
 
 class NumberKeyBoardState(
-    defaultValue: String = "0",
-    maxValue: Double? = null
+    defaultValue: String,
+    maxValue: Double?
 ) {
     var value by mutableStateOf(defaultValue)
     var maxValue by mutableStateOf(maxValue)
