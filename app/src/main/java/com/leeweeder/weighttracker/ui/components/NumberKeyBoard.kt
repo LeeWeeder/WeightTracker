@@ -84,10 +84,10 @@ class NumberKeyBoardState(
 fun NumberKeyBoard(
     modifier: Modifier = Modifier,
     state: NumberKeyBoardState,
-    onValueChange: (String) -> Unit = {}
+    onValueChange: ((String) -> Unit)? = null
 ) {
     LaunchedEffect(key1 = state.value) {
-        onValueChange(state.value)
+        onValueChange?.invoke(state.value)
     }
 
     Row(
