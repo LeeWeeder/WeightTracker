@@ -42,18 +42,27 @@ inline fun <reified T : Number> String.toTypeOrNull(): T? {
 
 @Composable
 fun rememberNumberKeyBoardState(
-    defaultValue: String
+    defaultValue: String,
+    maxValue: Double?
 ): NumberKeyBoardState {
     requireConvertibleTo<Double>(defaultValue)
     return remember {
-        NumberKeyBoardState(defaultValue)
+        NumberKeyBoardState(defaultValue, maxValue = maxValue)
     }
 }
 
 class NumberKeyBoardState(
-    defaultValue: String = "0"
+    defaultValue: String = "0",
+    maxValue: Double? = null
 ) {
     var value by mutableStateOf(defaultValue)
+    var maxValue by mutableStateOf(maxValue)
+
+    init {
+        if (maxValue != null) {
+            require(value.toDouble() <= maxValue)
+        }
+    }
 
     fun clear() {
         value = "0"
@@ -64,7 +73,7 @@ class NumberKeyBoardState(
 
         val parsedValue = potentialValue.also { if (it.endsWith('.')) it + '0' }.toDoubleOrNull()
 
-        if (parsedValue != null) {
+        if (parsedValue != null && (maxValue != null && parsedValue <= maxValue!!)) {
             if (!potentialValue.contains('.') || potentialValue.split('.')[1].length <= 2) {
                 value = potentialValue
             }
