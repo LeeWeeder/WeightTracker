@@ -113,7 +113,7 @@ fun MainNavigation(
                 popEnterTransition = popEnterTransition
             ) { LogScreen(sharedViewModel = addEditLogSharedViewModel) }
             composable(
-                route = Screen.AddEditLogScreen.route + "?$LOG_ID_KEY={$LOG_ID_KEY}" + "&$FROM_SET_GOAL_WEIGHT_SCREEN={$FROM_SET_GOAL_WEIGHT_SCREEN}",
+                route = Screen.AddEditLogScreen.route,
                 arguments = listOf(
                     navArgument(name = LOG_ID_KEY) {
                         type = NavType.IntType

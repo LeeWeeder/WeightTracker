@@ -169,7 +169,7 @@ internal fun LogScreen(
                                     },
                                     modifier = Modifier
                                         .clickable {
-                                            navController.navigate(Screen.AddEditLogScreen.route + "?logId=${log.id}&logWeight=${log.weight}")
+                                            navController.navigate(Screen.AddEditLogScreen.createRoute(logId = log.id))
                                         },
                                     colors = ListItemDefaults.colors(
                                         containerColor = Color.Transparent
