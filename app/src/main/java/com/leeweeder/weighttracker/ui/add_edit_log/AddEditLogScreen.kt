@@ -152,8 +152,9 @@ internal fun AddEditLogScreen(
             topBar = {
                 LargeTopAppBar(
                     title = {
+                        val text = if (isFromSetGoalWeightScreen) "Add initial weight" else "Add weight"
                         Text(
-                            text = "Add weight",
+                            text = text,
                             style = MaterialTheme.typography.displaySmall
                         )
                     },
