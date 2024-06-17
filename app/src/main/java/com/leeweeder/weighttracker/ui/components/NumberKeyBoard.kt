@@ -26,6 +26,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.leeweeder.weighttracker.R
 
+inline fun <reified T : Number> requireConvertibleTo(valueString: String) {
+    if (valueString.toTypeOrNull<T>() == null) {
+        throw IllegalArgumentException("Value must be convertible to ${T::class.simpleName}")
+    }
+}
+
+inline fun <reified T : Number> String.toTypeOrNull(): T? {
+    return when (T::class) {
+        Double::class -> toDoubleOrNull() as T?
+        Int::class -> toIntOrNull() as T?
+        else -> null
+    }
+}
+
 @Composable
 fun rememberNumberKeyBoardState(
     defaultValue: String
