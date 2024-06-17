@@ -93,7 +93,8 @@ fun MainNavigation(
 
     CompositionLocalProvider(value = LocalNavController provides navController) {
         val addEditLogSharedViewModel: AddEditLogSharedViewModel = viewModel()
-        NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
+        // Start destination to OnBoarding for testing purposes
+        NavHost(navController = navController, startDestination = Screen.OnBoardingScreen.route) {
             composable(
                 Screen.HomeScreen.route,
                 enterTransition = enterTransition,

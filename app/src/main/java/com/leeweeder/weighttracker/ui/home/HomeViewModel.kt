@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeScreenViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     private val logUseCases: LogUseCases,
     private val dataStoreUseCases: DataStoreUseCases
 ) : ViewModel() {
