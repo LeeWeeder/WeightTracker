@@ -303,11 +303,7 @@ internal fun AddEditLogScreen(
                 .padding(8.dp),
             state = numberKeyBoardState
         ) {
-            val value = it.toDouble()
-            if (value > MAX_WEIGHT)
-                return@NumberKeyBoard
-
-            onEvent(AddEditLogEvent.SetWeight(value))
+            onEvent(AddEditLogEvent.SetWeight(it.toDouble()))
         }
     }
 }
