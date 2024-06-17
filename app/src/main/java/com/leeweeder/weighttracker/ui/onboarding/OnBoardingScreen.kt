@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.weighttracker.ui.LocalNavController
+import com.leeweeder.weighttracker.ui.add_edit_log.FROM_SET_GOAL_WEIGHT_SCREEN
+import com.leeweeder.weighttracker.ui.add_edit_log.LOG_ID_KEY
 import com.leeweeder.weighttracker.ui.components.NumberKeyBoard
 import com.leeweeder.weighttracker.ui.components.rememberNumberKeyBoardState
 import com.leeweeder.weighttracker.util.MAX_WEIGHT
@@ -129,7 +131,7 @@ fun OnBoardingScreen(
                 Button(
                     onClick = {
                         setWeight(numberKeyBoardState.value.toDouble())
-                        navController.navigate(Screen.AddEditLogScreen.route) {
+                        navController.navigate(Screen.AddEditLogScreen.route + "?$LOG_ID_KEY=-1&$FROM_SET_GOAL_WEIGHT_SCREEN=" + true) {
                             popUpTo(Screen.OnBoardingScreen.route) {
                                 inclusive = true
                             }

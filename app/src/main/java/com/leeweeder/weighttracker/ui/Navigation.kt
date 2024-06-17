@@ -38,9 +38,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.leeweeder.weighttracker.ui.add_edit_log.AddEditLogScreen
+import com.leeweeder.weighttracker.ui.add_edit_log.FROM_SET_GOAL_WEIGHT_SCREEN
+import com.leeweeder.weighttracker.ui.add_edit_log.LOG_ID_KEY
 import com.leeweeder.weighttracker.ui.home.HomeScreen
 import com.leeweeder.weighttracker.ui.log.LogScreen
-import com.leeweeder.weighttracker.ui.log.LogViewModel
 import com.leeweeder.weighttracker.ui.onboarding.OnBoardingScreen
 import com.leeweeder.weighttracker.util.Screen
 
@@ -112,11 +113,15 @@ fun MainNavigation(
                 popEnterTransition = popEnterTransition
             ) { LogScreen(sharedViewModel = addEditLogSharedViewModel) }
             composable(
-                route = Screen.AddEditLogScreen.route + "?logId={logId}",
+                route = Screen.AddEditLogScreen.route + "?$LOG_ID_KEY={$LOG_ID_KEY}" + "&$FROM_SET_GOAL_WEIGHT_SCREEN={$FROM_SET_GOAL_WEIGHT_SCREEN}",
                 arguments = listOf(
-                    navArgument(name = "logId") {
+                    navArgument(name = LOG_ID_KEY) {
                         type = NavType.IntType
                         defaultValue = -1
+                    },
+                    navArgument(name = FROM_SET_GOAL_WEIGHT_SCREEN) {
+                        type = NavType.BoolType
+                        defaultValue = false
                     }
                 ),
                 enterTransition = enterTransition,

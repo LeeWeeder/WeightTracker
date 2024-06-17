@@ -68,6 +68,7 @@ fun AddEditLogScreen(
     val newlyAddedId = viewModel.newlyAddedId.value
     AddEditLogScreen(
         uiState = addEditLogUiState,
+        isFromSetGoalWeightScreen = viewModel.isFromSetGoalWeightScreen.value,
         onEvent = viewModel::onEvent,
         newlyAddedId = newlyAddedId,
         onInsertLog = sharedViewModel::addNewLogId
@@ -78,6 +79,7 @@ fun AddEditLogScreen(
 @Composable
 internal fun AddEditLogScreen(
     uiState: AddEditLogUiState,
+    isFromSetGoalWeightScreen: Boolean,
     newlyAddedId: Long?,
     onEvent: (AddEditLogEvent) -> Unit,
     onInsertLog: (Long) -> Unit
@@ -87,6 +89,7 @@ internal fun AddEditLogScreen(
             onInsertLog(newlyAddedId)
         }
     }
+
     val navController = LocalNavController.current
     if (uiState.datePickerDialogVisible) {
         val datePickerState =
