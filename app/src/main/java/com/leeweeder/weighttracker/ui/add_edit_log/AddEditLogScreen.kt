@@ -53,6 +53,7 @@ import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.components.NumberKeyBoard
 import com.leeweeder.weighttracker.ui.components.TimePickerDialog
 import com.leeweeder.weighttracker.ui.components.rememberNumberKeyBoardState
+import com.leeweeder.weighttracker.ui.util.formatToTwoDecimalPlaces
 import com.leeweeder.weighttracker.ui.util.getFormattedDate
 import com.leeweeder.weighttracker.util.MAX_WEIGHT
 import java.time.Instant
@@ -139,7 +140,10 @@ internal fun AddEditLogScreen(
             onEvent(AddEditLogEvent.SetTime(it))
         },
     )
-    val numberKeyBoardState = rememberNumberKeyBoardState(defaultValue = uiState.weight.displayValue)
+    val numberKeyBoardState = rememberNumberKeyBoardState(
+        defaultValue = uiState.weight.value.formatToTwoDecimalPlaces(false),
+        maxValue = MAX_WEIGHT
+    )
     Box {
         Scaffold(
             topBar = {
@@ -300,11 +304,7 @@ internal fun AddEditLogScreen(
                 .padding(8.dp),
             state = numberKeyBoardState
         ) {
-            val value = it.toDouble()
-            if (value > MAX_WEIGHT)
-                return@NumberKeyBoard
-
-            onEvent(AddEditLogEvent.SetWeight(value))
+            onEvent(AddEditLogEvent.SetWeight(it.toDouble()))
         }
     }
 }

@@ -58,7 +58,7 @@ import kotlin.math.absoluteValue
 
 @Composable
 fun HomeScreen(
-    homeViewModel: HomeScreenViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState = homeViewModel.homeUiState.value
     HomeScreen(uiState = uiState)

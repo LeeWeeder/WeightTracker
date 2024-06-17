@@ -26,25 +26,43 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.leeweeder.weighttracker.R
 
+inline fun <reified T : Number> requireConvertibleTo(valueString: String) {
+    if (valueString.toTypeOrNull<T>() == null) {
+        throw IllegalArgumentException("Value must be convertible to ${T::class.simpleName}")
+    }
+}
+
+inline fun <reified T : Number> String.toTypeOrNull(): T? {
+    return when (T::class) {
+        Double::class -> toDoubleOrNull() as T?
+        Int::class -> toIntOrNull() as T?
+        else -> null
+    }
+}
+
 @Composable
 fun rememberNumberKeyBoardState(
-    defaultValue: String
+    defaultValue: String = "0",
+    maxValue: Double? = null
 ): NumberKeyBoardState {
+    requireConvertibleTo<Double>(defaultValue)
     return remember {
-        NumberKeyBoardState(defaultValue)
+        NumberKeyBoardState(defaultValue, maxValue = maxValue)
     }
 }
 
 class NumberKeyBoardState(
-    defaultValue: String = "0"
+    defaultValue: String,
+    maxValue: Double?
 ) {
+    var value by mutableStateOf(defaultValue)
+    var maxValue by mutableStateOf(maxValue)
+
     init {
-        requireNotNull(defaultValue.toDoubleOrNull()) {
-            "Default value must be a number"
+        if (maxValue != null) {
+            require(value.toDouble() <= maxValue)
         }
     }
-
-    var value by mutableStateOf(defaultValue.let { if (it.toDouble() == 0.0) "0" else it })
 
     fun clear() {
         value = "0"
@@ -55,7 +73,7 @@ class NumberKeyBoardState(
 
         val parsedValue = potentialValue.also { if (it.endsWith('.')) it + '0' }.toDoubleOrNull()
 
-        if (parsedValue != null) {
+        if (parsedValue != null && (maxValue != null && parsedValue <= maxValue!!)) {
             if (!potentialValue.contains('.') || potentialValue.split('.')[1].length <= 2) {
                 value = potentialValue
             }
@@ -75,10 +93,10 @@ class NumberKeyBoardState(
 fun NumberKeyBoard(
     modifier: Modifier = Modifier,
     state: NumberKeyBoardState,
-    onValueChange: (String) -> Unit = {}
+    onValueChange: ((String) -> Unit)? = null
 ) {
     LaunchedEffect(key1 = state.value) {
-        onValueChange(state.value)
+        onValueChange?.invoke(state.value)
     }
 
     Row(

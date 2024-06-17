@@ -41,6 +41,7 @@ import com.leeweeder.weighttracker.ui.add_edit_log.AddEditLogScreen
 import com.leeweeder.weighttracker.ui.home.HomeScreen
 import com.leeweeder.weighttracker.ui.log.LogScreen
 import com.leeweeder.weighttracker.ui.log.LogViewModel
+import com.leeweeder.weighttracker.ui.onboarding.OnBoardingScreen
 import com.leeweeder.weighttracker.util.Screen
 
 val LocalNavController =
@@ -92,7 +93,8 @@ fun MainNavigation(
 
     CompositionLocalProvider(value = LocalNavController provides navController) {
         val addEditLogSharedViewModel: AddEditLogSharedViewModel = viewModel()
-        NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
+        // Start destination to OnBoarding for testing purposes
+        NavHost(navController = navController, startDestination = Screen.OnBoardingScreen.route) {
             composable(
                 Screen.HomeScreen.route,
                 enterTransition = enterTransition,
@@ -123,6 +125,11 @@ fun MainNavigation(
                 popEnterTransition = popEnterTransition
             ) {
                 AddEditLogScreen(sharedViewModel = addEditLogSharedViewModel)
+            }
+            composable(
+                route = Screen.OnBoardingScreen.route
+            ) {
+                OnBoardingScreen()
             }
         }
     }

@@ -54,10 +54,10 @@ class MainActivity : ComponentActivity() {
                     .collect()
             }
         }
-
-        splashscreen.setKeepOnScreenCondition {
+        // Removed for now
+        /*splashscreen.setKeepOnScreenCondition {
             isLoading
-        }
+        }*/
 
         setContent {
             WeightTrackerTheme {
