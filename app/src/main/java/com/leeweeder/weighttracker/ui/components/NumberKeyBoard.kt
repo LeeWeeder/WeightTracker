@@ -53,13 +53,7 @@ fun rememberNumberKeyBoardState(
 class NumberKeyBoardState(
     defaultValue: String = "0"
 ) {
-    init {
-        requireNotNull(defaultValue.toDoubleOrNull()) {
-            "Default value must be a number"
-        }
-    }
-
-    var value by mutableStateOf(defaultValue.let { if (it.toDouble() == 0.0) "0" else it })
+    var value by mutableStateOf(defaultValue)
 
     fun clear() {
         value = "0"
