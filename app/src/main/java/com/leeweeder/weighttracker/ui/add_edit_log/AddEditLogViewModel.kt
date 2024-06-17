@@ -16,6 +16,9 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import javax.inject.Inject
 
+const val LOG_ID_KEY = "logId"
+const val FROM_SET_GOAL_WEIGHT_SCREEN = "fromSetGoalWeightScreen"
+
 @HiltViewModel
 class AddEditLogViewModel @Inject constructor(
     private val logUseCases: LogUseCases,
@@ -24,11 +27,14 @@ class AddEditLogViewModel @Inject constructor(
     private val _addEditLogUiState = mutableStateOf(AddEditLogUiState())
     val addEditLogUiState: State<AddEditLogUiState> = _addEditLogUiState
 
+    private val _isFromSetGoalWeightScreen = mutableStateOf(false)
+    val isFromSetGoalWeightScreen: State<Boolean> = _isFromSetGoalWeightScreen
+
     private val _newlyAddedId = mutableStateOf<Long?>(null)
     val newlyAddedId: State<Long?> = _newlyAddedId
 
     init {
-        savedStateHandle.get<Int>("logId")?.let { logId ->
+        savedStateHandle.get<Int>(LOG_ID_KEY)?.let { logId ->
             if (logId != -1) {
                 viewModelScope.launch {
                     logUseCases.getLogById(logId).also { log ->
@@ -41,6 +47,12 @@ class AddEditLogViewModel @Inject constructor(
                         )
                     }
                 }
+            }
+        }
+
+        savedStateHandle.get<Boolean>(FROM_SET_GOAL_WEIGHT_SCREEN)?.let { isFromSetGoalWeightScreen ->
+            if (isFromSetGoalWeightScreen) {
+                _isFromSetGoalWeightScreen.value = true
             }
         }
     }
