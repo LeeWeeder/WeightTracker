@@ -22,7 +22,8 @@ fun OnBoardingScreen() {
         .statusBarsPadding()) {
         Text(text = "Set your goal!")
 
-        val numberKeyBoardState = rememberNumberKeyBoardState(defaultValue = "0")
+        val numberKeyBoardState =
+            rememberNumberKeyBoardState(defaultValue = "0", maxValue = MAX_WEIGHT)
         Card {
             Text(text = numberKeyBoardState.value)
         }
