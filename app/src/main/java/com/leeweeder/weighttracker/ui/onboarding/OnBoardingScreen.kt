@@ -18,13 +18,15 @@ import com.leeweeder.weighttracker.util.MAX_WEIGHT
 
 @Composable
 fun OnBoardingScreen() {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .statusBarsPadding()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+    ) {
         Text(text = "Set your goal!")
 
         val numberKeyBoardState =
-            rememberNumberKeyBoardState(defaultValue = "0", maxValue = MAX_WEIGHT)
+            rememberNumberKeyBoardState(maxValue = MAX_WEIGHT)
         Card {
             Text(text = numberKeyBoardState.value)
         }
