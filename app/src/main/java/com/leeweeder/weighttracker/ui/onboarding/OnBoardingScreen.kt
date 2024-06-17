@@ -27,9 +27,11 @@ fun OnBoardingScreen() {
             Text(text = numberKeyBoardState.value)
         }
         Box(modifier = Modifier.fillMaxSize()) {
+            val outsidePadding = 8.dp
             NumberKeyBoard(
                 state = numberKeyBoardState, modifier = Modifier
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = outsidePadding)
+                    .padding(bottom = outsidePadding)
                     .align(Alignment.BottomCenter)
             ) {
             }
