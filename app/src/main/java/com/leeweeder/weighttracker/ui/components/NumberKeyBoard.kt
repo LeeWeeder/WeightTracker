@@ -44,6 +44,7 @@ inline fun <reified T : Number> String.toTypeOrNull(): T? {
 fun rememberNumberKeyBoardState(
     defaultValue: String
 ): NumberKeyBoardState {
+    requireConvertibleTo<Double>(defaultValue)
     return remember {
         NumberKeyBoardState(defaultValue)
     }
