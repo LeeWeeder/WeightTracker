@@ -139,7 +139,10 @@ internal fun AddEditLogScreen(
             onEvent(AddEditLogEvent.SetTime(it))
         },
     )
-    val numberKeyBoardState = rememberNumberKeyBoardState(defaultValue = uiState.weight.displayValue)
+    val numberKeyBoardState = rememberNumberKeyBoardState(
+        defaultValue = uiState.weight.displayValue,
+        maxValue = MAX_WEIGHT
+    )
     Box {
         Scaffold(
             topBar = {
