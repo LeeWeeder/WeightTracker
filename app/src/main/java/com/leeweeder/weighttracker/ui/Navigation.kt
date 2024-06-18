@@ -38,11 +38,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.leeweeder.weighttracker.ui.add_edit_log.AddEditLogScreen
-import com.leeweeder.weighttracker.ui.add_edit_log.FROM_SET_GOAL_WEIGHT_SCREEN
 import com.leeweeder.weighttracker.ui.add_edit_log.LOG_ID_KEY
 import com.leeweeder.weighttracker.ui.home.HomeScreen
 import com.leeweeder.weighttracker.ui.log.LogScreen
 import com.leeweeder.weighttracker.ui.onboarding.OnBoardingScreen
+import com.leeweeder.weighttracker.util.FROM_ON_BOARDING_KEY
 import com.leeweeder.weighttracker.util.Screen
 
 val LocalNavController =
@@ -97,14 +97,14 @@ fun MainNavigation(
 
         NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
             composable(
-                Screen.HomeScreen.route + "?fromOnBoarding={fromOnBoarding}",
-                arguments = listOf(navArgument("fromOnBoarding") { defaultValue = false }),
+                route = Screen.HomeScreen.route,
+                arguments = listOf(navArgument(FROM_ON_BOARDING_KEY) { defaultValue = false }),
                 enterTransition = enterTransition,
                 exitTransition = exitTransition,
                 popExitTransition = popExitTransition,
                 popEnterTransition = popEnterTransition
             ) { backStackEntry ->
-                backStackEntry.arguments?.getBoolean("fromOnBoarding")?.let {
+                backStackEntry.arguments?.getBoolean(FROM_ON_BOARDING_KEY)?.let {
                     HomeScreen(onNavigateToOnBoardingScreen = {
                         navController.navigate(Screen.OnBoardingScreen.route) {
                             popUpTo(Screen.HomeScreen.route) {
@@ -130,10 +130,6 @@ fun MainNavigation(
                     navArgument(name = LOG_ID_KEY) {
                         type = NavType.IntType
                         defaultValue = -1
-                    },
-                    navArgument(name = FROM_SET_GOAL_WEIGHT_SCREEN) {
-                        type = NavType.BoolType
-                        defaultValue = false
                     }
                 ),
                 enterTransition = enterTransition,

@@ -56,7 +56,6 @@ import com.leeweeder.weighttracker.ui.components.rememberNumberKeyBoardState
 import com.leeweeder.weighttracker.ui.util.formatToTwoDecimalPlaces
 import com.leeweeder.weighttracker.ui.util.getFormattedDate
 import com.leeweeder.weighttracker.util.MAX_WEIGHT
-import com.leeweeder.weighttracker.util.Screen
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -69,11 +68,9 @@ fun AddEditLogScreen(
     val newlyAddedId = viewModel.newlyAddedId.value
     AddEditLogScreen(
         uiState = addEditLogUiState,
-        isFromSetGoalWeightScreen = viewModel.isFromSetGoalWeightScreen.value,
         onEvent = viewModel::onEvent,
         newlyAddedId = newlyAddedId,
-        onInsertLog = sharedViewModel::addNewLogId,
-        onInitializeWeightRecord = viewModel::setShouldHideOnBoardingState
+        onInsertLog = sharedViewModel::addNewLogId
     )
 }
 
@@ -81,11 +78,9 @@ fun AddEditLogScreen(
 @Composable
 internal fun AddEditLogScreen(
     uiState: AddEditLogUiState,
-    isFromSetGoalWeightScreen: Boolean,
     newlyAddedId: Long?,
     onEvent: (AddEditLogEvent) -> Unit,
-    onInsertLog: (Long) -> Unit,
-    onInitializeWeightRecord: (shouldHideOnBoarding: Boolean) -> Unit
+    onInsertLog: (Long) -> Unit
 ) {
     LaunchedEffect(key1 = newlyAddedId) {
         if (newlyAddedId != null) {
@@ -155,21 +150,17 @@ internal fun AddEditLogScreen(
             topBar = {
                 LargeTopAppBar(
                     title = {
-                        val text =
-                            if (isFromSetGoalWeightScreen) "Add initial weight" else "Add weight"
                         Text(
-                            text = text,
+                            text = "Add weight",
                             style = MaterialTheme.typography.displaySmall
                         )
                     },
                     actions = {
-                        if (!isFromSetGoalWeightScreen) {
-                            Button(onClick = {
-                                onEvent(AddEditLogEvent.SaveLog)
-                                navController.navigateUp()
-                            }) {
-                                Text(text = "Save")
-                            }
+                        Button(onClick = {
+                            onEvent(AddEditLogEvent.SaveLog)
+                            navController.navigateUp()
+                        }) {
+                            Text(text = "Save")
                         }
                         if (uiState.currentLogId != -1) {
                             Box {
@@ -198,13 +189,11 @@ internal fun AddEditLogScreen(
                             }
                         }
                     }, navigationIcon = {
-                        if (!isFromSetGoalWeightScreen) {
-                            IconButton(onClick = { navController.popBackStack() }) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.close),
-                                    contentDescription = "Close add edit screen"
-                                )
-                            }
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.close),
+                                contentDescription = "Close add edit screen"
+                            )
                         }
                     })
             }
@@ -311,35 +300,13 @@ internal fun AddEditLogScreen(
             }
         }
 
-        Column(
+        NumberKeyBoard(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
+                .padding(8.dp)
+                .align(Alignment.BottomCenter),
+            state = numberKeyBoardState
         ) {
-            if (isFromSetGoalWeightScreen) {
-                Button(
-                    onClick = {
-                        onEvent(AddEditLogEvent.SaveLog)
-                        onInitializeWeightRecord(true)
-                        navController.navigate(Screen.HomeScreen.route + "?fromOnBoarding=true") {
-                            popUpTo(Screen.AddEditLogScreen.createRoute(fromSetGoalWeightScreen = true)) {
-                                inclusive = true
-                            }
-                        }
-                    }, modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(text = "Finish")
-                }
-            }
-
-            NumberKeyBoard(
-                modifier = Modifier
-                    .padding(8.dp),
-                state = numberKeyBoardState
-            ) {
-                onEvent(AddEditLogEvent.SetWeight(it.toDouble()))
-            }
+            onEvent(AddEditLogEvent.SetWeight(it.toDouble()))
         }
     }
 }

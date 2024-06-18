@@ -46,14 +46,16 @@ fun OnBoardingScreen(
     viewmodel: OnBoardingViewModel = hiltViewModel()
 ) {
     OnBoardingScreen(
-        setWeightState = viewmodel::setGoalWeight,
+        onFinishOnBoarding = viewmodel::onFinishOnBoarding,
+        hideOnBoarding = viewmodel::hideOnBoarding
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnBoardingScreen(
-    setWeightState: (Double) -> Unit
+    onFinishOnBoarding: (weight: Double) -> Unit,
+    hideOnBoarding: () -> Unit
 ) {
     val navController = LocalNavController.current
     Column(
@@ -62,13 +64,14 @@ fun OnBoardingScreen(
     ) {
         TopAppBar(title = { }, actions = {
             TextButton(onClick = {
-                navController.navigate(Screen.HomeScreen.route)
+                navController.navigate(Screen.HomeScreen.fromOnBoardingRoute)
+                hideOnBoarding()
             }) {
                 Text(text = "Skip")
             }
         })
 
-        val numberKeyBoardState =
+        val goalWeightState =
             rememberNumberKeyBoardState(maxValue = MAX_WEIGHT)
 
         Column(
@@ -93,7 +96,7 @@ fun OnBoardingScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = numberKeyBoardState.value,
+                        text = goalWeightState.value,
                         style = MaterialTheme.typography.displayLarge.copy(fontSize = (MaterialTheme.typography.displayLarge.fontSize.value + 20).sp),
                         textAlign = TextAlign.End,
                         modifier = Modifier
@@ -141,12 +144,8 @@ fun OnBoardingScreen(
             Column(modifier = Modifier.align(Alignment.BottomCenter)) {
                 Button(
                     onClick = {
-                        setWeightState(numberKeyBoardState.value.toDouble())
-                        navController.navigate(
-                            Screen.AddEditLogScreen.createRoute(
-                                fromSetGoalWeightScreen = true
-                            )
-                        ) {
+                        onFinishOnBoarding(goalWeightState.value.toDouble())
+                        navController.navigate(Screen.HomeScreen.fromOnBoardingRoute) {
                             popUpTo(Screen.OnBoardingScreen.route) {
                                 inclusive = true
                             }
@@ -156,12 +155,12 @@ fun OnBoardingScreen(
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
                 ) {
-                    Text(text = "Next")
+                    Text(text = "Finish")
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 val outsidePadding = 16.dp
                 NumberKeyBoard(
-                    state = numberKeyBoardState, modifier = Modifier
+                    state = goalWeightState, modifier = Modifier
                         .padding(horizontal = outsidePadding)
                         .padding(bottom = outsidePadding)
                 )

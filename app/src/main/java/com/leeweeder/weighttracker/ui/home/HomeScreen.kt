@@ -213,40 +213,53 @@ fun HomeScreen(
 
                                 }
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .padding(8.dp)
-                                        .fillMaxWidth()
-                                        .height(IntrinsicSize.Min),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
                                 ) {
                                     val differenceFromGoal = uiState.differenceFromGoal
-                                    Column(
-                                        modifier = Modifier.fillMaxHeight(),
-                                        verticalArrangement = Arrangement.SpaceEvenly
-                                    ) {
-                                        Text(
-                                            text = "Goal",
-                                            style = MaterialTheme.typography.labelSmall
-                                        )
-                                        Text(
-                                            text = "${
-                                                differenceFromGoal.absoluteValue.formatToTwoDecimalPlaces()
-                                            } kg " + if (differenceFromGoal > 0) {
-                                                "left"
-                                            } else {
-                                                "over"
-                                            },
-                                            style = MaterialTheme.typography.labelLarge.copy(
-                                                fontWeight = FontWeight.SemiBold
+                                    if (differenceFromGoal != null) {
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(8.dp)
+                                                .fillMaxWidth()
+                                                .height(IntrinsicSize.Min),
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Column(
+                                                modifier = Modifier.fillMaxHeight(),
+                                                verticalArrangement = Arrangement.SpaceEvenly
+                                            ) {
+                                                Text(
+                                                    text = "Goal",
+                                                    style = MaterialTheme.typography.labelSmall
+                                                )
+                                                Text(
+                                                    text = "${
+                                                        differenceFromGoal.absoluteValue.formatToTwoDecimalPlaces()
+                                                    } kg " + if (differenceFromGoal > 0) {
+                                                        "left"
+                                                    } else {
+                                                        "over"
+                                                    },
+                                                    style = MaterialTheme.typography.labelLarge.copy(
+                                                        fontWeight = FontWeight.SemiBold
+                                                    )
+                                                )
+                                            }
+                                            Text(
+                                                text = "${differenceFromGoal.formatToTwoDecimalPlaces()} kg",
+                                                style = MaterialTheme.typography.displaySmall,
+                                                color = MaterialTheme.colorScheme.secondary
                                             )
+                                        }
+                                    } else {
+                                        Text(
+                                            text = "Goal not set",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.outline
                                         )
                                     }
-                                    Text(
-                                        text = "${differenceFromGoal.formatToTwoDecimalPlaces()} kg",
-                                        style = MaterialTheme.typography.displaySmall,
-                                        color = MaterialTheme.colorScheme.secondary
-                                    )
                                 }
                             }
                         }
