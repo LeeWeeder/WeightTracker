@@ -25,19 +25,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import dagger.hilt.android.AndroidEntryPoint
-import com.leeweeder.weighttracker.ui.theme.WeightTrackerTheme
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.leeweeder.weighttracker.ui.theme.WeightTrackerTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     private val viewModel: MainActivityViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashscreen = installSplashScreen()
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -54,10 +56,10 @@ class MainActivity : ComponentActivity() {
                     .collect()
             }
         }
-        // Removed for now
-        /*splashscreen.setKeepOnScreenCondition {
+
+        splashscreen.setKeepOnScreenCondition {
             isLoading
-        }*/
+        }
 
         setContent {
             WeightTrackerTheme {

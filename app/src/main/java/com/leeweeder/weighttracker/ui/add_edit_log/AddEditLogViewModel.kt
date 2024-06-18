@@ -17,7 +17,6 @@ import java.time.Instant
 import javax.inject.Inject
 
 const val LOG_ID_KEY = "logId"
-const val FROM_SET_GOAL_WEIGHT_SCREEN = "fromSetGoalWeightScreen"
 
 @HiltViewModel
 class AddEditLogViewModel @Inject constructor(
@@ -26,9 +25,6 @@ class AddEditLogViewModel @Inject constructor(
 ) : ViewModel() {
     private val _addEditLogUiState = mutableStateOf(AddEditLogUiState())
     val addEditLogUiState: State<AddEditLogUiState> = _addEditLogUiState
-
-    private val _isFromSetGoalWeightScreen = mutableStateOf(false)
-    val isFromSetGoalWeightScreen: State<Boolean> = _isFromSetGoalWeightScreen
 
     private val _newlyAddedId = mutableStateOf<Long?>(null)
     val newlyAddedId: State<Long?> = _newlyAddedId
@@ -47,12 +43,6 @@ class AddEditLogViewModel @Inject constructor(
                         )
                     }
                 }
-            }
-        }
-
-        savedStateHandle.get<Boolean>(FROM_SET_GOAL_WEIGHT_SCREEN)?.let { isFromSetGoalWeightScreen ->
-            if (isFromSetGoalWeightScreen) {
-                _isFromSetGoalWeightScreen.value = true
             }
         }
     }

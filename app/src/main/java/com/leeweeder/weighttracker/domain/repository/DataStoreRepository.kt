@@ -4,8 +4,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface DataStoreRepository {
     suspend fun saveGoalWeight(value: Double)
-    fun readGoalWeightState(): Flow<Double>
+    fun readGoalWeightState(): Flow<Double?>
 
-    suspend fun saveOnBoardingState(showOnBoarding: Boolean)
+    suspend fun saveShouldHideOnBoarding(shouldHideOnBoarding: Boolean)
     fun readOnBoardingState(): Flow<Boolean>
 }

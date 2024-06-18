@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -19,10 +18,12 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,21 +42,36 @@ import com.leeweeder.weighttracker.util.MAX_WEIGHT
 import com.leeweeder.weighttracker.util.Screen
 
 @Composable
-fun OnBoardingScreen(viewmodel: OnBoardingViewModel = hiltViewModel()) {
-    OnBoardingScreen(setWeight = viewmodel::setGoalWeight)
+fun OnBoardingScreen(
+    viewmodel: OnBoardingViewModel = hiltViewModel()
+) {
+    OnBoardingScreen(
+        onFinishOnBoarding = viewmodel::onFinishOnBoarding,
+        hideOnBoarding = viewmodel::hideOnBoarding
+    )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnBoardingScreen(
-    setWeight: (Double) -> Unit
+    onFinishOnBoarding: (weight: Double) -> Unit,
+    hideOnBoarding: () -> Unit
 ) {
     val navController = LocalNavController.current
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding()
     ) {
-        val numberKeyBoardState =
+        TopAppBar(title = { }, actions = {
+            TextButton(onClick = {
+                navController.navigate(Screen.HomeScreen.fromOnBoardingRoute)
+                hideOnBoarding()
+            }) {
+                Text(text = "Skip")
+            }
+        })
+
+        val goalWeightState =
             rememberNumberKeyBoardState(maxValue = MAX_WEIGHT)
 
         Column(
@@ -80,7 +96,7 @@ fun OnBoardingScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = numberKeyBoardState.value,
+                        text = goalWeightState.value,
                         style = MaterialTheme.typography.displayLarge.copy(fontSize = (MaterialTheme.typography.displayLarge.fontSize.value + 20).sp),
                         textAlign = TextAlign.End,
                         modifier = Modifier
@@ -128,12 +144,8 @@ fun OnBoardingScreen(
             Column(modifier = Modifier.align(Alignment.BottomCenter)) {
                 Button(
                     onClick = {
-                        setWeight(numberKeyBoardState.value.toDouble())
-                        navController.navigate(
-                            Screen.AddEditLogScreen.createRoute(
-                                fromSetGoalWeightScreen = true
-                            )
-                        ) {
+                        onFinishOnBoarding(goalWeightState.value.toDouble())
+                        navController.navigate(Screen.HomeScreen.fromOnBoardingRoute) {
                             popUpTo(Screen.OnBoardingScreen.route) {
                                 inclusive = true
                             }
@@ -143,12 +155,12 @@ fun OnBoardingScreen(
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
                 ) {
-                    Text(text = "Next")
+                    Text(text = "Finish")
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 val outsidePadding = 16.dp
                 NumberKeyBoard(
-                    state = numberKeyBoardState, modifier = Modifier
+                    state = goalWeightState, modifier = Modifier
                         .padding(horizontal = outsidePadding)
                         .padding(bottom = outsidePadding)
                 )
