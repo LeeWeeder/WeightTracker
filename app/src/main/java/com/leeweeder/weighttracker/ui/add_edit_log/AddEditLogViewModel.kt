@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leeweeder.weighttracker.domain.model.Log
+import com.leeweeder.weighttracker.domain.usecases.DataStoreUseCases
 import com.leeweeder.weighttracker.domain.usecases.LogUseCases
 import com.leeweeder.weighttracker.ui.util.getDatePickerCompatibleFormat
 import com.leeweeder.weighttracker.ui.util.getFormattedDate
@@ -22,6 +23,7 @@ const val FROM_SET_GOAL_WEIGHT_SCREEN = "fromSetGoalWeightScreen"
 @HiltViewModel
 class AddEditLogViewModel @Inject constructor(
     private val logUseCases: LogUseCases,
+    private val dataStoreUseCases: DataStoreUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _addEditLogUiState = mutableStateOf(AddEditLogUiState())
@@ -54,6 +56,12 @@ class AddEditLogViewModel @Inject constructor(
             if (isFromSetGoalWeightScreen) {
                 _isFromSetGoalWeightScreen.value = true
             }
+        }
+    }
+
+    fun setShouldHideOnBoardingState(shouldHideOnBoardingState: Boolean) {
+        viewModelScope.launch {
+            dataStoreUseCases.saveOnBoardingState(shouldHideOnBoardingState)
         }
     }
 

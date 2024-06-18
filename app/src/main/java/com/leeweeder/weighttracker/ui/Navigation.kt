@@ -94,17 +94,28 @@ fun MainNavigation(
 
     CompositionLocalProvider(value = LocalNavController provides navController) {
         val addEditLogSharedViewModel: AddEditLogSharedViewModel = viewModel()
-        // Start destination to OnBoarding for testing purposes
-        NavHost(navController = navController, startDestination = Screen.OnBoardingScreen.route) {
+
+        NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
             composable(
-                Screen.HomeScreen.route,
+                Screen.HomeScreen.route + "?fromOnBoarding={fromOnBoarding}",
+                arguments = listOf(navArgument("fromOnBoarding") { defaultValue = false }),
                 enterTransition = enterTransition,
                 exitTransition = exitTransition,
                 popExitTransition = popExitTransition,
                 popEnterTransition = popEnterTransition
-            ) {
-                HomeScreen()
+            ) { backStackEntry ->
+                backStackEntry.arguments?.getBoolean("fromOnBoarding")?.let {
+                    HomeScreen(onNavigateToOnBoardingScreen = {
+                        navController.navigate(Screen.OnBoardingScreen.route) {
+                            popUpTo(Screen.HomeScreen.route) {
+                                inclusive = true
+                            }
+                        }
+                        viewModel.setIsLoading(false)
+                    }, fromOnBoarding = it, mainActivityViewModel = viewModel)
+                }
             }
+
             composable(
                 Screen.LogScreen.route,
                 enterTransition = enterTransition,
@@ -112,6 +123,7 @@ fun MainNavigation(
                 popExitTransition = popExitTransition,
                 popEnterTransition = popEnterTransition
             ) { LogScreen(sharedViewModel = addEditLogSharedViewModel) }
+
             composable(
                 route = Screen.AddEditLogScreen.route,
                 arguments = listOf(
@@ -129,8 +141,11 @@ fun MainNavigation(
                 popExitTransition = popExitTransition,
                 popEnterTransition = popEnterTransition
             ) {
-                AddEditLogScreen(sharedViewModel = addEditLogSharedViewModel)
+                AddEditLogScreen(
+                    sharedViewModel = addEditLogSharedViewModel
+                )
             }
+
             composable(
                 route = Screen.OnBoardingScreen.route
             ) {

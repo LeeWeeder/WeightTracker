@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -19,10 +18,12 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,20 +42,32 @@ import com.leeweeder.weighttracker.util.MAX_WEIGHT
 import com.leeweeder.weighttracker.util.Screen
 
 @Composable
-fun OnBoardingScreen(viewmodel: OnBoardingViewModel = hiltViewModel()) {
-    OnBoardingScreen(setWeight = viewmodel::setGoalWeight)
+fun OnBoardingScreen(
+    viewmodel: OnBoardingViewModel = hiltViewModel()
+) {
+    OnBoardingScreen(
+        setWeightState = viewmodel::setGoalWeight,
+    )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnBoardingScreen(
-    setWeight: (Double) -> Unit
+    setWeightState: (Double) -> Unit
 ) {
     val navController = LocalNavController.current
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding()
     ) {
+        TopAppBar(title = { }, actions = {
+            TextButton(onClick = {
+                navController.navigate(Screen.HomeScreen.route)
+            }) {
+                Text(text = "Skip")
+            }
+        })
+
         val numberKeyBoardState =
             rememberNumberKeyBoardState(maxValue = MAX_WEIGHT)
 
@@ -128,7 +141,7 @@ fun OnBoardingScreen(
             Column(modifier = Modifier.align(Alignment.BottomCenter)) {
                 Button(
                     onClick = {
-                        setWeight(numberKeyBoardState.value.toDouble())
+                        setWeightState(numberKeyBoardState.value.toDouble())
                         navController.navigate(
                             Screen.AddEditLogScreen.createRoute(
                                 fromSetGoalWeightScreen = true

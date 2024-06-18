@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.LocalNavController
+import com.leeweeder.weighttracker.ui.MainActivityViewModel
 import com.leeweeder.weighttracker.ui.util.formatToTwoDecimalPlaces
 import com.leeweeder.weighttracker.ui.util.getFormattedDate
 import com.leeweeder.weighttracker.util.Screen
@@ -58,10 +59,34 @@ import kotlin.math.absoluteValue
 
 @Composable
 fun HomeScreen(
-    homeViewModel: HomeViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    mainActivityViewModel: MainActivityViewModel = hiltViewModel(),
+    onNavigateToOnBoardingScreen: () -> Unit,
+    fromOnBoarding: Boolean
 ) {
     val uiState = homeViewModel.homeUiState.value
-    HomeScreen(uiState = uiState)
+    if (!fromOnBoarding) {
+        when (mainActivityViewModel.shouldHideOnBoarding.value) {
+            true -> {
+                mainActivityViewModel.setIsLoading(false)
+                HomeScreen(
+                    uiState = uiState
+                )
+            }
+
+            false -> {
+                LaunchedEffect(Unit) {
+                    onNavigateToOnBoardingScreen()
+                }
+            }
+
+            null -> mainActivityViewModel.setIsLoading(true)
+        }
+    } else {
+        HomeScreen(
+            uiState = uiState
+        )
+    }
 }
 
 @Composable
@@ -69,6 +94,7 @@ fun HomeScreen(
     uiState: HomeUiState
 ) {
     val navController = LocalNavController.current
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column {
             if (uiState.fiveMostRecentLogs.isNotEmpty()) {
@@ -204,7 +230,8 @@ fun HomeScreen(
                                             style = MaterialTheme.typography.labelSmall
                                         )
                                         Text(
-                                            text = "${differenceFromGoal.absoluteValue.formatToTwoDecimalPlaces()
+                                            text = "${
+                                                differenceFromGoal.absoluteValue.formatToTwoDecimalPlaces()
                                             } kg " + if (differenceFromGoal > 0) {
                                                 "left"
                                             } else {

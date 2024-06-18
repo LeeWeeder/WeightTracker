@@ -6,6 +6,6 @@ interface DataStoreRepository {
     suspend fun saveGoalWeight(value: Double)
     fun readGoalWeightState(): Flow<Double>
 
-    suspend fun saveOnBoardingState(showOnBoarding: Boolean)
+    suspend fun saveOnBoardingState(shouldHideOnBoarding: Boolean)
     fun readOnBoardingState(): Flow<Boolean>
 }

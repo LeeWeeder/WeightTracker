@@ -72,7 +72,8 @@ fun AddEditLogScreen(
         isFromSetGoalWeightScreen = viewModel.isFromSetGoalWeightScreen.value,
         onEvent = viewModel::onEvent,
         newlyAddedId = newlyAddedId,
-        onInsertLog = sharedViewModel::addNewLogId
+        onInsertLog = sharedViewModel::addNewLogId,
+        onInitializeWeightRecord = viewModel::setShouldHideOnBoardingState
     )
 }
 
@@ -83,7 +84,8 @@ internal fun AddEditLogScreen(
     isFromSetGoalWeightScreen: Boolean,
     newlyAddedId: Long?,
     onEvent: (AddEditLogEvent) -> Unit,
-    onInsertLog: (Long) -> Unit
+    onInsertLog: (Long) -> Unit,
+    onInitializeWeightRecord: (shouldHideOnBoarding: Boolean) -> Unit
 ) {
     LaunchedEffect(key1 = newlyAddedId) {
         if (newlyAddedId != null) {
@@ -317,7 +319,8 @@ internal fun AddEditLogScreen(
                 Button(
                     onClick = {
                         onEvent(AddEditLogEvent.SaveLog)
-                        navController.navigate(Screen.HomeScreen.route) {
+                        onInitializeWeightRecord(true)
+                        navController.navigate(Screen.HomeScreen.route + "?fromOnBoarding=true") {
                             popUpTo(Screen.AddEditLogScreen.createRoute(fromSetGoalWeightScreen = true)) {
                                 inclusive = true
                             }

@@ -19,7 +19,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "we
 class DataStoreRepositoryImpl(context: Context): DataStoreRepository {
     private object PreferencesKey {
         val goalWeightKey = doublePreferencesKey(name = "GOAL_WEIGHT")
-        val onBoardingKey = booleanPreferencesKey(name = "ONBOARDING")
+        val shouldHideOnBoardingKey = booleanPreferencesKey(name = "ONBOARDING")
     }
 
     private val dataStore = context.dataStore
@@ -42,9 +42,9 @@ class DataStoreRepositoryImpl(context: Context): DataStoreRepository {
             }
     }
 
-    override suspend fun saveOnBoardingState(showOnBoarding: Boolean) {
+    override suspend fun saveOnBoardingState(shouldHideOnBoarding: Boolean) {
         dataStore.edit { preferences ->
-            preferences[PreferencesKey.onBoardingKey] = showOnBoarding
+            preferences[PreferencesKey.shouldHideOnBoardingKey] = shouldHideOnBoarding
         }
     }
 
@@ -55,7 +55,7 @@ class DataStoreRepositoryImpl(context: Context): DataStoreRepository {
                 else throw exception
             }
             .map { preferences ->
-                val onBoardingState = preferences[PreferencesKey.onBoardingKey] ?: true
+                val onBoardingState = preferences[PreferencesKey.shouldHideOnBoardingKey] ?: false
                 onBoardingState
             }
     }

@@ -19,13 +19,14 @@ class MainActivityViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(true)
     val isLoading = _isLoading.asStateFlow()
 
-    private val _showOnBoarding = mutableStateOf<Boolean?>(null)
-    val showOnBoarding: State<Boolean?> = _showOnBoarding
+    private val _shouldHideOnBoarding = mutableStateOf<Boolean?>(null)
+    val shouldHideOnBoarding: State<Boolean?> = _shouldHideOnBoarding
 
     init {
         viewModelScope.launch {
             dataStoreUseCases.readOnBoardingState().collectLatest {
-                _showOnBoarding.value = it
+                _shouldHideOnBoarding.value = it
+                println(shouldHideOnBoarding)
             }
         }
     }

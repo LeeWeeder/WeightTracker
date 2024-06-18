@@ -5,7 +5,7 @@ import com.leeweeder.weighttracker.domain.repository.DataStoreRepository
 class SaveOnBoardingState(
     private val repository: DataStoreRepository
 ) {
-    suspend operator fun invoke(showOnBoarding: Boolean) {
-        repository.saveOnBoardingState(showOnBoarding)
+    suspend operator fun invoke(shouldHideOnBoarding: Boolean) {
+        repository.saveOnBoardingState(shouldHideOnBoarding)
     }
 }
