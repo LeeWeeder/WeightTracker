@@ -17,14 +17,17 @@
 package com.leeweeder.weighttracker.domain.model
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.leeweeder.weighttracker.util.Weight
-import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
 
-@Entity
+@Entity(indices = [Index(value = ["date"], unique = true)])
 data class Log(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
     val weight: Weight,
-    val date: Instant = Instant.now()
+    val date: LocalDate,
+    val time: LocalTime
 )
