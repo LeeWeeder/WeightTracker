@@ -31,7 +31,7 @@ fun WeightTrackerTheme(
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-    val colorScheme = dynamicDarkColorScheme(context).copy(surface = Color.Black, background = Color.Black)
+    val colorScheme = dynamicDarkColorScheme(context)
 
     val view = LocalView.current
     if (!view.isInEditMode) {
