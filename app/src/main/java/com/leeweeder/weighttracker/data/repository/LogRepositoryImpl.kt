@@ -4,6 +4,7 @@ import com.leeweeder.weighttracker.data.datasource.LogDao
 import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.domain.repository.LogRepository
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 class LogRepositoryImpl(
     private val dao: LogDao
@@ -18,6 +19,10 @@ class LogRepositoryImpl(
 
     override suspend fun getLogById(id: Int): Log {
         return dao.getLogById(id)
+    }
+
+    override suspend fun getLogByDate(date: LocalDate): Log {
+        return dao.getLogByDate(date)
     }
 
     override suspend fun insertLog(log: Log): Long {
