@@ -21,13 +21,11 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.leeweeder.weighttracker.util.Weight
 import java.time.LocalDate
-import java.time.LocalTime
 
 @Entity(indices = [Index(value = ["date"], unique = true)])
 data class Log(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
     val weight: Weight,
-    val date: LocalDate,
-    val time: LocalTime
+    val date: LocalDate
 )
