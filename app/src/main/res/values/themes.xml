@@ -17,7 +17,8 @@
 
 <resources>
 
-    <style name="Theme.WeightTracker" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.WeightTracker" parent="android:Theme.Material.Light.NoActionBar">
+    </style>
 
     <style name="Theme.WeightTracker.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>

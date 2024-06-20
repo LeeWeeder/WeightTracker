@@ -188,7 +188,7 @@ internal fun AddEditLogScreen(
                     trailingContent = {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
-                                text = uiState.date.format("EEE, mm d", true),
+                                text = uiState.date.format("EEE, MM d", true),
                                 modifier = Modifier
                                     .clip(MaterialTheme.shapes.small)
                                     .clickable {
