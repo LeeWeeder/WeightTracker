@@ -16,6 +16,7 @@ import com.leeweeder.weighttracker.domain.usecases.datastore.SaveGoalWeight
 import com.leeweeder.weighttracker.domain.usecases.datastore.SaveShouldHideOnBoarding
 import com.leeweeder.weighttracker.domain.usecases.log.DeleteLogById
 import com.leeweeder.weighttracker.domain.usecases.log.GetFiveMostRecentLogs
+import com.leeweeder.weighttracker.domain.usecases.log.GetLogByDate
 import com.leeweeder.weighttracker.domain.usecases.log.GetLogById
 import com.leeweeder.weighttracker.domain.usecases.log.GetLogs
 import com.leeweeder.weighttracker.domain.usecases.log.InsertLog
@@ -55,7 +56,8 @@ object AppModule {
             insertLog = InsertLog(repository),
             updateLog = UpdateLog(repository),
             deleteLogById = DeleteLogById(repository),
-            getFiveMostRecentLogs = GetFiveMostRecentLogs(repository)
+            getFiveMostRecentLogs = GetFiveMostRecentLogs(repository),
+            getLogByDate = GetLogByDate(repository)
         )
     }
 

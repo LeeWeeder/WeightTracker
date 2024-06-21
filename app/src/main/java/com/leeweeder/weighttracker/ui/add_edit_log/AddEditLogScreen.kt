@@ -32,7 +32,6 @@ import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,13 +50,11 @@ import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.AddEditLogSharedViewModel
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.components.NumberKeyBoard
-import com.leeweeder.weighttracker.ui.components.TimePickerDialog
 import com.leeweeder.weighttracker.ui.components.rememberNumberKeyBoardState
+import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.ui.util.formatToTwoDecimalPlaces
-import com.leeweeder.weighttracker.ui.util.getFormattedDate
+import com.leeweeder.weighttracker.ui.util.toEpochMilli
 import com.leeweeder.weighttracker.util.MAX_WEIGHT
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 
 @Composable
 fun AddEditLogScreen(
@@ -125,22 +122,6 @@ internal fun AddEditLogScreen(
         }
     }
 
-    val time = uiState.time
-
-    val timePickerState = rememberTimePickerState(
-        initialHour = time.getFormattedDate("h").toInt(),
-        initialMinute = time.getFormattedDate("mm").toInt()
-    )
-
-    TimePickerDialog(
-        state = timePickerState, visible = uiState.timePickerDialogVisible,
-        onCancel = {
-            onEvent(AddEditLogEvent.TimePickerDialogToggleVisibility(show = false))
-        },
-        onConfirm = {
-            onEvent(AddEditLogEvent.SetTime(it))
-        },
-    )
     val numberKeyBoardState = rememberNumberKeyBoardState(
         defaultValue = uiState.weight.value.formatToTwoDecimalPlaces(false),
         maxValue = MAX_WEIGHT
@@ -206,18 +187,8 @@ internal fun AddEditLogScreen(
                     },
                     trailingContent = {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            val selectedDate = uiState.date
-                            val dateToday = Instant.now()
-
-                            val difference = ChronoUnit.DAYS.between(selectedDate, dateToday)
                             Text(
-                                text = when (difference) {
-                                    0L -> "Today"
-                                    1L -> "Yesterday"
-                                    else -> selectedDate.getFormattedDate(
-                                        pattern = "EEE, MMM d"
-                                    )
-                                },
+                                text = uiState.date.format("EEE, mm d", true),
                                 modifier = Modifier
                                     .clip(MaterialTheme.shapes.small)
                                     .clickable {
@@ -230,17 +201,6 @@ internal fun AddEditLogScreen(
                                     .padding(10.dp),
                                 style = MaterialTheme.typography.titleSmall
                             )
-                            Text(text = time.getFormattedDate("h:mm a"), modifier = Modifier
-                                .clip(MaterialTheme.shapes.small)
-                                .clickable {
-                                    onEvent(
-                                        AddEditLogEvent.TimePickerDialogToggleVisibility(
-                                            show = true
-                                        )
-                                    )
-                                }
-                                .padding(10.dp),
-                                style = MaterialTheme.typography.titleSmall)
                         }
                     },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent)

@@ -2,19 +2,10 @@ package com.leeweeder.weighttracker.data.datasource
 
 import androidx.room.TypeConverter
 import com.leeweeder.weighttracker.util.Weight
-import java.time.Instant
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class Converters {
-    @TypeConverter
-    fun fromTimestamp(date: Instant): Long {
-        return date.toEpochMilli()
-    }
-
-    @TypeConverter
-    fun toTimestamp(value: Long): Instant {
-        return Instant.ofEpochMilli(value)
-    }
-
     @TypeConverter
     fun fromWeight(weight: Weight): Double {
         return weight.value
@@ -23,5 +14,15 @@ class Converters {
     @TypeConverter
     fun toWeight(value: Double): Weight {
         return Weight(value)
+    }
+
+    @TypeConverter
+    fun fromLocalDate(date: LocalDate): String {
+        return date.format(DateTimeFormatter.ISO_LOCAL_DATE)
+    }
+
+    @TypeConverter
+    fun toLocalDate(value: String): LocalDate {
+        return LocalDate.parse(value)
     }
 }

@@ -26,6 +26,8 @@ interface LogRepository {
 
     suspend fun getLogById(id: Int): Log
 
+    suspend fun getLogByDate(millis: Long): Log
+
     suspend fun insertLog(log: Log): Long
 
     suspend fun updateLog(log: Log)

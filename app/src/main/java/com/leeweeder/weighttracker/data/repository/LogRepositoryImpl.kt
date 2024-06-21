@@ -20,6 +20,10 @@ class LogRepositoryImpl(
         return dao.getLogById(id)
     }
 
+    override suspend fun getLogByDate(millis: Long): Log {
+        return dao.getLogByDate(millis)
+    }
+
     override suspend fun insertLog(log: Log): Long {
         return dao.insertLog(log)
     }

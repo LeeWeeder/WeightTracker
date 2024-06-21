@@ -45,7 +45,6 @@ import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.MainActivityViewModel
 import com.leeweeder.weighttracker.ui.util.formatToTwoDecimalPlaces
-import com.leeweeder.weighttracker.ui.util.getFormattedDate
 import com.leeweeder.weighttracker.util.Screen
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
@@ -55,6 +54,7 @@ import com.patrykandpatrick.vico.compose.common.shader.color
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.common.shader.DynamicShader
+import java.time.format.DateTimeFormatter
 import kotlin.math.absoluteValue
 
 @Composable
@@ -117,7 +117,7 @@ fun HomeScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = mostRecentLog!!.date.getFormattedDate(),
+                                text = mostRecentLog!!.date.format(DateTimeFormatter.ISO_LOCAL_DATE),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.outline
                             )
@@ -296,7 +296,7 @@ fun HomeScreen(
                             ListItem(
                                 headlineContent = {
                                     Text(
-                                        text = log.date.getFormattedDate(),
+                                        text = log.date.format(DateTimeFormatter.ISO_LOCAL_DATE),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
