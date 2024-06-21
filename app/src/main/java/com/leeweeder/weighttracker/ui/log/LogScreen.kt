@@ -53,9 +53,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.AddEditLogSharedViewModel
 import com.leeweeder.weighttracker.ui.LocalNavController
-import com.leeweeder.weighttracker.ui.util.getFormattedDate
 import com.leeweeder.weighttracker.util.Screen
 import kotlinx.coroutines.delay
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun LogScreen(
@@ -155,7 +155,7 @@ internal fun LogScreen(
                                 ListItem(
                                     headlineContent = {
                                         Text(
-                                            text = log.date.getFormattedDate(),
+                                            text = log.date.format(DateTimeFormatter.ISO_LOCAL_DATE),
                                             style = MaterialTheme.typography.labelMedium
                                         )
                                     },
@@ -181,7 +181,7 @@ internal fun LogScreen(
                         ListItem(
                             headlineContent = {
                                 Text(
-                                    text = log.date.getFormattedDate(),
+                                    text = log.date.format(DateTimeFormatter.ISO_LOCAL_DATE),
                                     style = MaterialTheme.typography.labelMedium
                                 )
                             },

@@ -18,7 +18,6 @@ package com.leeweeder.weighttracker.domain.repository
 
 import com.leeweeder.weighttracker.domain.model.Log
 import kotlinx.coroutines.flow.Flow
-import java.time.LocalDate
 
 interface LogRepository {
     fun getLogs(): Flow<List<Log>>
@@ -27,7 +26,7 @@ interface LogRepository {
 
     suspend fun getLogById(id: Int): Log
 
-    suspend fun getLogByDate(date: LocalDate): Log
+    suspend fun getLogByDate(millis: Long): Log
 
     suspend fun insertLog(log: Log): Long
 

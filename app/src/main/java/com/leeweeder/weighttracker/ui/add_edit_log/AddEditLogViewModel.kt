@@ -1,6 +1,5 @@
 package com.leeweeder.weighttracker.ui.add_edit_log
 
-import android.icu.util.Calendar
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -8,12 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.domain.usecases.LogUseCases
-import com.leeweeder.weighttracker.ui.util.getDatePickerCompatibleFormat
-import com.leeweeder.weighttracker.ui.util.getFormattedDate
+import com.leeweeder.weighttracker.ui.util.epochMillisToLocalDate
 import com.leeweeder.weighttracker.util.Weight
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.time.Instant
 import javax.inject.Inject
 
 const val LOG_ID_KEY = "logId"
@@ -36,9 +33,7 @@ class AddEditLogViewModel @Inject constructor(
                     logUseCases.getLogById(logId).also { log ->
                         _addEditLogUiState.value = addEditLogUiState.value.copy(
                             currentLogId = log.id,
-                            date = log.date.getDatePickerCompatibleFormat(),
-                            time = log.date,
-                            dateIsSetByUser = true,
+                            date = log.date,
                             weight = log.weight
                         )
                     }
@@ -52,43 +47,25 @@ class AddEditLogViewModel @Inject constructor(
             is AddEditLogEvent.SetDate -> {
                 onEvent(AddEditLogEvent.DatePickerDialogToggleVisibility(show = false))
                 _addEditLogUiState.value = addEditLogUiState.value.copy(
-                    dateIsSetByUser = true,
-                    date = Instant.ofEpochMilli(event.millis)
-                )
-            }
-
-            is AddEditLogEvent.SetTime -> {
-                onEvent(AddEditLogEvent.TimePickerDialogToggleVisibility(show = false))
-                _addEditLogUiState.value = addEditLogUiState.value.copy(
-                    dateIsSetByUser = true,
-                    time = Instant.ofEpochMilli(event.millis)
+                    date = epochMillisToLocalDate(event.millis)
                 )
             }
 
             AddEditLogEvent.SaveLog -> {
                 val weight = addEditLogUiState.value.weight
                 val currentLogId = addEditLogUiState.value.currentLogId
+                val date = addEditLogUiState.value.date
 
-                if (addEditLogUiState.value.dateIsSetByUser) {
-                    val date = combineDateAndTime()
-                    if (currentLogId != -1) {
-                        val log = Log(id = currentLogId, weight = weight, date = date)
-                        viewModelScope.launch {
-                            logUseCases.updateLog(
-                                log = log
-                            )
-                            _newlyAddedId.value = currentLogId.toLong()
-                        }
-                    } else {
-                        val log = Log(weight = weight, date = date)
-                        viewModelScope.launch {
-                            _newlyAddedId.value = logUseCases.insertLog(
-                                log = log
-                            )
-                        }
+                if (currentLogId != -1) {
+                    val log = Log(id = currentLogId, weight = weight, date = date)
+                    viewModelScope.launch {
+                        logUseCases.updateLog(
+                            log = log
+                        )
+                        _newlyAddedId.value = currentLogId.toLong()
                     }
                 } else {
-                    val log = Log(weight = weight)
+                    val log = Log(weight = weight, date = date)
                     viewModelScope.launch {
                         _newlyAddedId.value = logUseCases.insertLog(
                             log = log
@@ -98,12 +75,6 @@ class AddEditLogViewModel @Inject constructor(
             }
 
             is AddEditLogEvent.DatePickerDialogToggleVisibility -> {
-                _addEditLogUiState.value = addEditLogUiState.value.copy(
-                    datePickerDialogVisible = event.show
-                )
-            }
-
-            is AddEditLogEvent.TimePickerDialogToggleVisibility -> {
                 _addEditLogUiState.value = addEditLogUiState.value.copy(
                     datePickerDialogVisible = event.show
                 )
@@ -121,24 +92,5 @@ class AddEditLogViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    private fun combineDateAndTime(): Instant {
-        val date = addEditLogUiState.value.date
-        val time = addEditLogUiState.value.time
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.YEAR, date.getFormattedDate("yyyy").toInt())
-        calendar.set(Calendar.MONTH, date.getFormattedDate("M").toInt() - 1)
-        calendar.set(Calendar.DATE, date.getFormattedDate("d").toInt())
-        calendar.set(Calendar.HOUR, time.getFormattedDate("h").toInt())
-        calendar.set(Calendar.MINUTE, time.getFormattedDate("m").toInt())
-
-        if (time.getFormattedDate("a").equals("AM", ignoreCase = true)) {
-            calendar.set(Calendar.AM_PM, Calendar.AM)
-        } else {
-            calendar.set(Calendar.AM_PM, Calendar.PM)
-        }
-
-        return Instant.ofEpochMilli(calendar.timeInMillis)
     }
 }
