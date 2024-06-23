@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.weighttracker.R
@@ -113,9 +114,14 @@ fun HomeScreen(
     onNavigateToAddEditLogScreen: () -> Unit = {}
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val fabHeight = remember {
+        mutableStateOf(0.dp)
+    }
     Scaffold(
         floatingActionButton = {
-            AddWeightRecordFab(onClick = onNavigateToAddEditLogScreen)
+            AddWeightRecordFab(onClick = onNavigateToAddEditLogScreen, onHeightSet = {
+                fabHeight.value = it
+            })
         },
         topBar = {
             WeightTrackerTopAppBar(scrollBehavior = scrollBehavior)
@@ -126,7 +132,7 @@ fun HomeScreen(
             uiState = uiState,
             modelProducer = modelProducer,
             onNavigateToLogScreen = onNavigateToLogScreen,
-            paddingValues = it
+            paddingValues = PaddingValues(top = it.calculateTopPadding(), bottom = it.calculateBottomPadding() + fabHeight.value + 16.dp)
         )
     }
 }
@@ -276,9 +282,15 @@ private fun RecentRecord(uiState: HomeUiState, onNavigateToLogScreen: () -> Unit
 }
 
 @Composable
-private fun AddWeightRecordFab(onClick: () -> Unit) {
+private fun AddWeightRecordFab(onClick: () -> Unit, onHeightSet: (Dp) -> Unit = {}) {
+    val density = LocalDensity.current
     FloatingActionButton(
-        onClick = onClick
+        onClick = onClick,
+        modifier = Modifier.onGloballyPositioned {
+            onHeightSet(with(density) {
+                it.size.height.toDp()
+            })
+        }
     ) {
         Icon(
             painter = painterResource(id = R.drawable.add_weight_record),
