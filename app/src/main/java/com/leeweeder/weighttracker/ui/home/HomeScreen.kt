@@ -22,7 +22,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -144,7 +143,7 @@ fun HomeScreenContent(
     paddingValues: PaddingValues,
     onNavigateToLogScreen: () -> Unit
 ) {
-    LazyColumn(contentPadding = paddingValues, modifier = Modifier.padding(horizontal = 8.dp)) {
+    LazyColumn(contentPadding = paddingValues, modifier = Modifier.padding(horizontal = 16.dp)) {
         item {
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -226,10 +225,7 @@ fun HomeScreenContent(
 
 @Composable
 private fun RecentRecord(uiState: HomeUiState, onNavigateToLogScreen: () -> Unit) {
-    ElevatedCard(
-        modifier = Modifier
-            .padding(8.dp)
-    ) {
+    ElevatedCard {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -272,8 +268,7 @@ private fun RecentRecord(uiState: HomeUiState, onNavigateToLogScreen: () -> Unit
                                 )
                             }
                         },
-                        modifier = Modifier.clip(shape = MaterialTheme.shapes.medium),
-                        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
+                        modifier = Modifier.clip(shape = MaterialTheme.shapes.medium)
                     )
                 }
             }
@@ -336,7 +331,7 @@ fun WeightTrackerTopAppBar(scrollBehavior: TopAppBarScrollBehavior? = null) {
 fun LineChart(data: List<Log>, modelProducer: ChartEntryModelProducer) {
     ElevatedCard(
         modifier = Modifier
-            .padding(vertical = 16.dp, horizontal = 8.dp),
+            .padding(vertical = 16.dp),
         onClick = {}
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
