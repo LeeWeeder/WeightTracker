@@ -196,10 +196,10 @@ fun HomeScreenContent(
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(
                     text = differenceFromGoal?.absoluteValue?.let {
-                        it.formatToOneDecimalPlace() + "kg " + if (differenceFromGoal > 0) {
-                            "left"
+                        it.formatToOneDecimalPlace() + " kg " + if (differenceFromGoal > 0) {
+                            "left to gain"
                         } else {
-                            "over"
+                            "left to lose"
                         }
                     }
                         ?: "-",
