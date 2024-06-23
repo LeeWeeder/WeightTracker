@@ -345,6 +345,7 @@ fun LineChart(data: List<Log>, modelProducer: ChartEntryModelProducer) {
 
             LaunchedEffect(data) {
                 val entries = List(data.size) { entryOf(it, data[it].weight.value) }
+                android.util.Log.d("Value", data.size.toString())
                 modelProducer.setEntries(entries)
             }
 
@@ -411,7 +412,7 @@ private fun TrendIndicator(uiState: HomeUiState, modifier: Modifier = Modifier) 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         val difference = uiState.differenceFromPrevious
         Text(
-            text = difference?.let { it.formatToOneDecimalPlace() + " kg" } ?: "-",
+            text = difference?.let { it.formatToOneDecimalPlace(showPlusSign = true) + " kg" } ?: "-",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.outline
         )
