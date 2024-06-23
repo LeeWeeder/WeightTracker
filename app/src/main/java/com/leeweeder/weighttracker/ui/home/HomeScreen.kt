@@ -1,6 +1,7 @@
 package com.leeweeder.weighttracker.ui.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,8 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,20 +28,25 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.MainActivityViewModel
+import com.leeweeder.weighttracker.ui.components.GoalProgressCircle
 import com.leeweeder.weighttracker.ui.util.format
-import com.leeweeder.weighttracker.ui.util.formatToTwoDecimalPlaces
+import com.leeweeder.weighttracker.ui.util.formatToOneDecimalPlace
 import com.leeweeder.weighttracker.util.Screen
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
@@ -106,7 +112,7 @@ fun HomeScreen(
             AddWeightRecordFab(onClick = onNavigateToAddEditLogScreen)
         },
         topBar = {
-            TopAppCard(uiState = uiState)
+            WeightTrackerTopAppBar()
         }
     ) {
         HomeScreenContent(
@@ -125,14 +131,88 @@ fun HomeScreenContent(
     onNavigateToLogScreen: () -> Unit,
     modifier: Modifier
 ) {
-    Column(modifier = modifier) {
-        LineChart(data = uiState.fiveMostRecentLogs, modelProducer = modelProducer)
-        RecentRecord(uiState = uiState, onNavigateToLogScreen = onNavigateToLogScreen)
+    LazyColumn(modifier = modifier.padding(horizontal = 8.dp)) {
+        item {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                val currentWeightWidth = remember { mutableStateOf(0.dp) }
+                val density = LocalDensity.current
+
+                CurrentWeight(
+                    uiState = uiState,
+                    modifier = Modifier.onGloballyPositioned {
+                        currentWeightWidth.value = with(density) {
+                            it.size.width.toDp()
+                        }
+                    }
+                )
+
+                val offset = 16.dp
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(y = -offset),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.Bottom,
+                ) {
+                    Text(
+                        text = "57.0",
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.End,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                    Spacer(
+                        modifier = Modifier.width(currentWeightWidth.value - 40.dp)
+                    )
+                    Text(
+                        text = uiState.goalWeight?.formatToOneDecimalPlace(showTrailingZero = true)
+                            ?: "Not set",
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
+            }
+        }
+        item {
+            val differenceFromGoal = uiState.differenceFromGoal
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = differenceFromGoal?.absoluteValue?.let {
+                        it.formatToOneDecimalPlace() + "kg " + if (differenceFromGoal > 0) {
+                            "left"
+                        } else {
+                            "over"
+                        }
+                    }
+                        ?: "-",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.tertiaryContainer,
+                            shape = MaterialTheme.shapes.extraSmall
+                        )
+                        .padding(horizontal = 4.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+        item {
+            LineChart(data = uiState.fiveMostRecentLogs, modelProducer = modelProducer)
+        }
+        item {
+            RecentRecord(uiState = uiState, onNavigateToLogScreen = onNavigateToLogScreen)
+        }
     }
 }
 
 @Composable
-fun RecentRecord(uiState: HomeUiState, onNavigateToLogScreen: () -> Unit) {
+private fun RecentRecord(uiState: HomeUiState, onNavigateToLogScreen: () -> Unit) {
     ElevatedCard(
         modifier = Modifier
             .padding(8.dp)
@@ -189,19 +269,19 @@ fun RecentRecord(uiState: HomeUiState, onNavigateToLogScreen: () -> Unit) {
 }
 
 @Composable
-internal fun AddWeightRecordFab(onClick: () -> Unit) {
+private fun AddWeightRecordFab(onClick: () -> Unit) {
     FloatingActionButton(
         onClick = onClick
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.monitor_weight),
+            painter = painterResource(id = R.drawable.add_weight_record),
             contentDescription = "Add weight record"
         )
     }
 }
 
 @Composable
-internal fun NoData() {
+private fun NoData() {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -218,7 +298,7 @@ internal fun NoData() {
         Row {
             Text(text = "Click ", color = MaterialTheme.colorScheme.outline)
             Icon(
-                painter = painterResource(id = R.drawable.monitor_weight),
+                painter = painterResource(id = R.drawable.add_weight_record),
                 contentDescription = null,
                 modifier = Modifier.size(20.dp)
             )
@@ -232,76 +312,6 @@ internal fun NoData() {
 @Composable
 fun WeightTrackerTopAppBar() {
     CenterAlignedTopAppBar(title = { Text(text = "Weight Tracker") })
-}
-
-@Composable
-fun TopAppCard(uiState: HomeUiState) {
-    ElevatedCard(
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge
-    ) {
-        WeightTrackerTopAppBar()
-        CurrentWeight(uiState = uiState, modifier = Modifier.padding(horizontal = 16.dp))
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            GoalCard(goalWeight = uiState.goalWeight, modifier = Modifier.weight(1f))
-            RemainingCard(
-                differenceFromGoal = uiState.differenceFromGoal,
-                modifier = Modifier.weight(1f)
-            )
-        }
-        Spacer(modifier = Modifier.height(24.dp))
-    }
-}
-
-@Composable
-fun GoalCard(goalWeight: Double?, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier,
-        onClick = {}
-    ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            SectionLabel(title = "Goal")
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = goalWeight?.let { it.formatToTwoDecimalPlaces(showTrailingZero = false) + " kg" }
-                    ?: "-",
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.secondary
-            )
-        }
-    }
-}
-
-@Composable
-fun RemainingCard(differenceFromGoal: Double?, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .clip(MaterialTheme.shapes.medium)
-    ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            SectionLabel(title = "Remaining")
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = differenceFromGoal?.absoluteValue?.let {
-                    it.formatToTwoDecimalPlaces() + "kg " + if (differenceFromGoal > 0) {
-                        "left"
-                    } else {
-                        "over"
-                    }
-                }
-                    ?: "-",
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.secondary
-            )
-        }
-    }
 }
 
 @Composable
@@ -322,12 +332,13 @@ fun LineChart(data: List<Log>, modelProducer: ChartEntryModelProducer) {
 
             val lineColor = MaterialTheme.colorScheme.primary
 
-            Chart(chart = lineChart(
-                remember {
-                    listOf(lineSpec(lineColor, lineBackgroundShader = null))
-                },
-                axisValuesOverrider = AxisValuesOverrider.adaptiveYValues(1f, true)
-            ),
+            Chart(
+                chart = lineChart(
+                    remember {
+                        listOf(lineSpec(lineColor, lineBackgroundShader = null))
+                    },
+                    axisValuesOverrider = AxisValuesOverrider.adaptiveYValues(1f, true)
+                ),
                 chartModelProducer = modelProducer,
                 startAxis = rememberStartAxis(),
                 bottomAxis = rememberBottomAxis()
@@ -338,30 +349,31 @@ fun LineChart(data: List<Log>, modelProducer: ChartEntryModelProducer) {
 
 @Composable
 fun CurrentWeight(uiState: HomeUiState, modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
-        SectionLabel(title = "Current weight")
-        Spacer(modifier = Modifier.height(8.dp))
-        val mostRecentLog = uiState.mostRecentLog
-
-        Text(
-            text = mostRecentLog?.date?.format("EEE, MM d", true) ?: "-",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.outline
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = mostRecentLog?.weight?.displayValue ?: "-",
-                style = MaterialTheme.typography.displayLarge,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.weight(1f)
-            )
-            TrendIndicator(uiState = uiState, modifier = Modifier.weight(1f))
+    val mostRecentLog = uiState.mostRecentLog
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
+        SectionLabel(title = "Current weight", modifier = Modifier.padding(top = 16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+        Box(contentAlignment = Alignment.BottomCenter) {
+            GoalProgressCircle(progress = 0f)
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = mostRecentLog?.date?.format("EEE, MM d", true) ?: "-",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Text(
+                    text = mostRecentLog?.weight?.displayValue ?: "-",
+                    style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "kg",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                TrendIndicator(uiState = uiState)
+            }
         }
     }
 }
@@ -381,8 +393,9 @@ private fun TrendIndicator(uiState: HomeUiState, modifier: Modifier = Modifier) 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         val difference = uiState.differenceFromPrevious
         Text(
-            text = difference?.let { it.formatToTwoDecimalPlaces() + " kg" } ?: "-",
-            style = MaterialTheme.typography.labelSmall
+            text = difference?.let { it.formatToOneDecimalPlace() + " kg" } ?: "-",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.outline
         )
         Box(
             contentAlignment = Alignment.Center
