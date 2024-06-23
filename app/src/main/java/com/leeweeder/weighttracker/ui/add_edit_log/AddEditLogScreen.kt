@@ -52,7 +52,7 @@ import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.components.NumberKeyBoard
 import com.leeweeder.weighttracker.ui.components.rememberNumberKeyBoardState
 import com.leeweeder.weighttracker.ui.util.format
-import com.leeweeder.weighttracker.ui.util.formatToTwoDecimalPlaces
+import com.leeweeder.weighttracker.ui.util.formatToOneDecimalPlace
 import com.leeweeder.weighttracker.ui.util.toEpochMilli
 import com.leeweeder.weighttracker.util.MAX_WEIGHT
 
@@ -123,7 +123,7 @@ internal fun AddEditLogScreen(
     }
 
     val numberKeyBoardState = rememberNumberKeyBoardState(
-        defaultValue = uiState.weight.value.formatToTwoDecimalPlaces(false),
+        defaultValue = uiState.weight.value.formatToOneDecimalPlace(false),
         maxValue = MAX_WEIGHT
     )
     Box {
@@ -188,7 +188,7 @@ internal fun AddEditLogScreen(
                     trailingContent = {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
-                                text = uiState.date.format("EEE, mm d", true),
+                                text = uiState.date.format("EEE, MM d", true),
                                 modifier = Modifier
                                     .clip(MaterialTheme.shapes.small)
                                     .clickable {

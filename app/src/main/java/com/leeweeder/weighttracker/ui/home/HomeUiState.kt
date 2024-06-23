@@ -12,11 +12,11 @@ data class HomeUiState(
     private val previousMostRecentLog: Log?
         get() = if (fiveMostRecentLogs.size > 1) fiveMostRecentLogs[1] else null
 
-    val differenceFromPrevious: Double
+    val differenceFromPrevious: Double?
         get() = previousMostRecentLog?.weight?.value?.let {
             mostRecentLog?.weight?.value
                 ?.minus(it)
-        } ?: 0.0
+        }
 
     val differenceFromGoal: Double?
         get() = mostRecentLog?.weight?.value?.let {
