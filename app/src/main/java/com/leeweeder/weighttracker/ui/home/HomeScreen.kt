@@ -2,6 +2,7 @@ package com.leeweeder.weighttracker.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -239,8 +240,8 @@ private fun RecentRecord(uiState: HomeUiState, onNavigateToLogScreen: () -> Unit
             }
         }
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            modifier = Modifier.padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             if (uiState.fiveMostRecentLogs.isEmpty()) {
                 NoData()
@@ -268,11 +269,14 @@ private fun RecentRecord(uiState: HomeUiState, onNavigateToLogScreen: () -> Unit
                                 )
                             }
                         },
-                        modifier = Modifier.clip(shape = MaterialTheme.shapes.medium)
+                        modifier = Modifier
+                            .clip(shape = MaterialTheme.shapes.large)
+                            .clickable { /*TODO*/ }
                     )
                 }
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
