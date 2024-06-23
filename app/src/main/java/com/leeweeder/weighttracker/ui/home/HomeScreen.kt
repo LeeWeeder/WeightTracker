@@ -360,7 +360,10 @@ fun LineChart(data: List<Log>, modelProducer: ChartEntryModelProducer) {
                 ),
                 chartModelProducer = modelProducer,
                 startAxis = rememberStartAxis(),
-                bottomAxis = rememberBottomAxis()
+                bottomAxis = rememberBottomAxis(),
+                placeholder = {
+                    NoData()
+                }
             )
         }
     }
