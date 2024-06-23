@@ -253,7 +253,7 @@ private fun RecentRecord(uiState: HomeUiState, onNavigateToLogScreen: () -> Unit
                     ListItem(
                         headlineContent = {
                             Text(
-                                text = log.date.format("EEE, MM d", true),
+                                text = log.date.format("EEE, MMM d, yyyy", true),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
