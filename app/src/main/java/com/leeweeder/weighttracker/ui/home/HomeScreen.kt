@@ -303,14 +303,13 @@ private fun AddWeightRecordFab(onClick: () -> Unit, onHeightSet: (Dp) -> Unit = 
 private fun NoData() {
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
             painter = painterResource(id = R.drawable.no_data),
             contentDescription = "No data available",
             alpha = 0.5f,
-            modifier = Modifier.size(250.dp)
+            modifier = Modifier.size(150.dp)
         )
         Text(text = "No data available", color = MaterialTheme.colorScheme.outlineVariant)
         Spacer(modifier = Modifier.height(4.dp))
@@ -323,7 +322,7 @@ private fun NoData() {
             )
             Text(text = " to add one", color = MaterialTheme.colorScheme.outline)
         }
-        Spacer(modifier = Modifier.height(128.dp))
+        Spacer(modifier = Modifier.height(40.dp))
     }
 }
 
