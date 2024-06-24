@@ -30,14 +30,14 @@ class DataStoreRepositoryImpl(context: Context): DataStoreRepository {
         }
     }
 
-    override fun readGoalWeightState(): Flow<Double?> {
+    override fun readGoalWeightState(): Flow<Double> {
         return dataStore.data
             .catch { exception ->
                 if (exception is IOException) emit(emptyPreferences())
                 else throw exception
             }
             .map { preferences ->
-                val goalWeightState = preferences[PreferencesKey.goalWeightKey]
+                val goalWeightState = preferences[PreferencesKey.goalWeightKey] ?: 0.0
                 goalWeightState
             }
     }

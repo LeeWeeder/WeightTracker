@@ -18,12 +18,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,31 +44,19 @@ fun OnBoardingScreen(
     viewmodel: OnBoardingViewModel = hiltViewModel()
 ) {
     OnBoardingScreen(
-        onFinishOnBoarding = viewmodel::onFinishOnBoarding,
-        hideOnBoarding = viewmodel::hideOnBoarding
+        onFinishOnBoarding = viewmodel::onFinishOnBoarding
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnBoardingScreen(
-    onFinishOnBoarding: (weight: Double) -> Unit,
-    hideOnBoarding: () -> Unit
+    onFinishOnBoarding: (weight: Double) -> Unit
 ) {
     val navController = LocalNavController.current
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        TopAppBar(title = { }, actions = {
-            TextButton(onClick = {
-                navController.navigate(Screen.HomeScreen.fromOnBoardingRoute)
-                hideOnBoarding()
-            }) {
-                Text(text = "Skip")
-            }
-        })
-
         val goalWeightState =
             rememberNumberKeyBoardState(maxValue = MAX_WEIGHT)
 
