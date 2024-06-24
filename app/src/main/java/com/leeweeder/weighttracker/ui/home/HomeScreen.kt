@@ -182,8 +182,7 @@ fun HomeScreenContent(
                         modifier = Modifier.width(currentWeightWidth.value - 40.dp)
                     )
                     Text(
-                        text = uiState.goalWeight?.formatToOneDecimalPlace(showTrailingZero = true)
-                            ?: "Not set",
+                        text = uiState.goalWeight.formatToOneDecimalPlace(showTrailingZero = true),
                         modifier = Modifier.weight(1f),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.outline

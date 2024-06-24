@@ -4,7 +4,7 @@ import com.leeweeder.weighttracker.domain.model.Log
 
 data class HomeUiState(
     val fiveMostRecentLogs: List<Log> = emptyList(),
-    val goalWeight: Double? = null
+    val goalWeight: Double = 0.0
 ) {
     val mostRecentLog: Log?
         get() = fiveMostRecentLogs.firstOrNull()
@@ -20,6 +20,6 @@ data class HomeUiState(
 
     val differenceFromGoal: Double?
         get() = mostRecentLog?.weight?.value?.let {
-            goalWeight?.minus(it)
+            goalWeight.minus(it)
         }
 }

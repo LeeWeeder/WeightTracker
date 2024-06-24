@@ -22,7 +22,7 @@ class OnBoardingViewModel @Inject constructor(
         }
     }
 
-    fun hideOnBoarding() {
+    private fun hideOnBoarding() {
         viewModelScope.launch {
             dataStoreUseCases.saveShouldHideOnBoarding(true)
         }
