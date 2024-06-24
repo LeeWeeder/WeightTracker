@@ -7,12 +7,12 @@ import java.time.format.DateTimeFormatter
 
 class Converters {
     @TypeConverter
-    fun fromWeight(weight: Weight): Double {
+    fun fromWeight(weight: Weight): Float {
         return weight.value
     }
 
     @TypeConverter
-    fun toWeight(value: Double): Weight {
+    fun toWeight(value: Float): Weight {
         return Weight(value)
     }
 
