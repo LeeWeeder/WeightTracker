@@ -1,5 +1,6 @@
 package com.leeweeder.weighttracker.data.repository
 
+import com.leeweeder.weighttracker.data.datasource.IsoLocalDate
 import com.leeweeder.weighttracker.data.datasource.LogDao
 import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.domain.repository.LogRepository
@@ -20,8 +21,8 @@ class LogRepositoryImpl(
         return dao.getLogById(id)
     }
 
-    override suspend fun getLogByDate(millis: Long): Log {
-        return dao.getLogByDate(millis)
+    override suspend fun getLogByDate(date: IsoLocalDate): Log {
+        return dao.getLogByDate(date)
     }
 
     override suspend fun insertLog(log: Log): Long {
