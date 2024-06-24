@@ -228,7 +228,7 @@ internal fun AddEditLogScreen(
                             )
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                AnimatedVisibility(visible = uiState.weight.value != 0.0) {
+                                AnimatedVisibility(visible = uiState.weight.value != 0f) {
                                     IconButton(onClick = {
                                         numberKeyBoardState.clear()
                                     }) {
@@ -266,7 +266,7 @@ internal fun AddEditLogScreen(
                 .align(Alignment.BottomCenter),
             state = numberKeyBoardState
         ) {
-            onEvent(AddEditLogEvent.SetWeight(it.toDouble()))
+            onEvent(AddEditLogEvent.SetWeight(it.toFloat()))
         }
     }
 }

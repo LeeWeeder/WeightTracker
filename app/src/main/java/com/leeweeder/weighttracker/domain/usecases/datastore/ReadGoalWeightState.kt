@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 class ReadGoalWeightState(
     private val repository: DataStoreRepository
 ) {
-    operator fun invoke(): Flow<Double> {
+    operator fun invoke(): Flow<Float> {
         return repository.readGoalWeightState()
     }
 }
