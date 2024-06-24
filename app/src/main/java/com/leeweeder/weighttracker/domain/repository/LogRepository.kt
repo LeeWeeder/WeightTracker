@@ -16,6 +16,7 @@
 
 package com.leeweeder.weighttracker.domain.repository
 
+import com.leeweeder.weighttracker.data.datasource.IsoLocalDate
 import com.leeweeder.weighttracker.domain.model.Log
 import kotlinx.coroutines.flow.Flow
 
@@ -26,7 +27,7 @@ interface LogRepository {
 
     suspend fun getLogById(id: Int): Log
 
-    suspend fun getLogByDate(millis: Long): Log
+    suspend fun getLogByDate(date: IsoLocalDate): Log
 
     suspend fun insertLog(log: Log): Long
 

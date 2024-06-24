@@ -8,6 +8,8 @@ import androidx.room.Update
 import com.leeweeder.weighttracker.domain.model.Log
 import kotlinx.coroutines.flow.Flow
 
+typealias IsoLocalDate = String
+
 @Dao
 interface LogDao {
     @Query("SELECT * FROM log ORDER BY date DESC")
@@ -19,8 +21,8 @@ interface LogDao {
     @Query("SELECT * FROM log WHERE id = :id")
     suspend fun getLogById(id: Int): Log
 
-    @Query("SELECT * FROM log WHERE date = :millis")
-    suspend fun getLogByDate(millis: Long): Log
+    @Query("SELECT * FROM log WHERE date = :date")
+    suspend fun getLogByDate(date: IsoLocalDate): Log
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLog(log: Log): Long
