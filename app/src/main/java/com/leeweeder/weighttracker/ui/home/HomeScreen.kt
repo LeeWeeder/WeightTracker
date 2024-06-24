@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,8 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -105,7 +103,6 @@ fun HomeScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
@@ -113,7 +110,6 @@ fun HomeScreen(
     onNavigateToLogScreen: () -> Unit = {},
     onNavigateToAddEditLogScreen: () -> Unit = {}
 ) {
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val fabHeight = remember {
         mutableStateOf(0.dp)
     }
@@ -122,17 +118,16 @@ fun HomeScreen(
             AddWeightRecordFab(onClick = onNavigateToAddEditLogScreen, onHeightSet = {
                 fabHeight.value = it
             })
-        },
-        topBar = {
-            WeightTrackerTopAppBar(scrollBehavior = scrollBehavior)
-        },
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        }
     ) {
         HomeScreenContent(
             uiState = uiState,
             modelProducer = modelProducer,
             onNavigateToLogScreen = onNavigateToLogScreen,
-            paddingValues = PaddingValues(top = it.calculateTopPadding(), bottom = it.calculateBottomPadding() + fabHeight.value + 16.dp)
+            paddingValues = PaddingValues(
+                top = it.calculateTopPadding(),
+                bottom = it.calculateBottomPadding() + fabHeight.value + 32.dp
+            )
         )
     }
 }
@@ -144,7 +139,13 @@ fun HomeScreenContent(
     paddingValues: PaddingValues,
     onNavigateToLogScreen: () -> Unit
 ) {
-    LazyColumn(contentPadding = paddingValues, modifier = Modifier.padding(horizontal = 16.dp)) {
+    LazyColumn(
+        contentPadding = paddingValues,
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .consumeWindowInsets(paddingValues)
+    ) {
+        item { WeightTrackerTopAppBar() }
         item {
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -326,8 +327,10 @@ private fun NoData() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WeightTrackerTopAppBar(scrollBehavior: TopAppBarScrollBehavior? = null) {
-    CenterAlignedTopAppBar(title = { Text(text = "Weight Tracker") }, scrollBehavior = scrollBehavior)
+fun WeightTrackerTopAppBar() {
+    CenterAlignedTopAppBar(
+        title = { Text(text = "Weight Tracker") }
+    )
 }
 
 @Composable
@@ -413,7 +416,8 @@ private fun TrendIndicator(uiState: HomeUiState, modifier: Modifier = Modifier) 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         val difference = uiState.differenceFromPrevious
         Text(
-            text = difference?.let { it.formatToOneDecimalPlace(showPlusSign = true) + " kg" } ?: "-",
+            text = difference?.let { it.formatToOneDecimalPlace(showPlusSign = true) + " kg" }
+                ?: "-",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.outline
         )
