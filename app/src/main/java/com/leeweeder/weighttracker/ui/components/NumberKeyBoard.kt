@@ -74,7 +74,7 @@ class NumberKeyBoardState(
         val parsedValue = potentialValue.also { if (it.endsWith('.')) it + '0' }.toDoubleOrNull()
 
         if (parsedValue != null && (maxValue != null && parsedValue <= maxValue!!)) {
-            if (!potentialValue.contains('.') || potentialValue.split('.')[1].length <= 2) {
+            if (!potentialValue.contains('.') || potentialValue.split('.')[1].length < 2) {
                 value = potentialValue
             }
         }
