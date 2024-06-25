@@ -4,6 +4,7 @@ import com.leeweeder.weighttracker.data.datasource.IsoLocalDate
 import com.leeweeder.weighttracker.data.datasource.LogDao
 import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.domain.repository.LogRepository
+import com.leeweeder.weighttracker.util.Weight
 import kotlinx.coroutines.flow.Flow
 
 class LogRepositoryImpl(
@@ -15,6 +16,10 @@ class LogRepositoryImpl(
 
     override fun getFiveMostRecentLogs(): Flow<List<Log>> {
         return dao.getFiveMostRecentLogs()
+    }
+
+    override fun getOldestLogWeight(): Flow<Weight?> {
+        return dao.getOldestLogWeight()
     }
 
     override suspend fun getLogById(id: Int): Log {

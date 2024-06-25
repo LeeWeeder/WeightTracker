@@ -26,9 +26,11 @@ class HomeViewModel @Inject constructor(
     val modelProducer = ChartEntryModelProducer()
 
     private var getFiveMostRecentLogsJob: Job? = null
+    private var getOldestLogWeightJob: Job? = null
 
     init {
         getFiveMostRecentLogs()
+        getOldestLogWeight()
         viewModelScope.launch {
             dataStoreUseCases.readGoalWeightState().collectLatest { goalWeight ->
                 _homeUiState.value = homeUiState.value.copy(
@@ -44,6 +46,17 @@ class HomeViewModel @Inject constructor(
             .onEach { logs ->
                 _homeUiState.value = homeUiState.value.copy(
                     fiveMostRecentLogs = logs
+                )
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun getOldestLogWeight() {
+        getOldestLogWeightJob?.cancel()
+        getOldestLogWeightJob = logUseCases.getOldestLogWeight()
+            .onEach { weight ->
+                _homeUiState.value = homeUiState.value.copy(
+                    oldestLogWeight = weight
                 )
             }
             .launchIn(viewModelScope)

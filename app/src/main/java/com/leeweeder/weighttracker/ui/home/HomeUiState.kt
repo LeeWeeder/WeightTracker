@@ -1,10 +1,12 @@
 package com.leeweeder.weighttracker.ui.home
 
 import com.leeweeder.weighttracker.domain.model.Log
+import com.leeweeder.weighttracker.util.Weight
 
 data class HomeUiState(
     val fiveMostRecentLogs: List<Log> = emptyList(),
-    val goalWeight: Int = 0
+    val goalWeight: Int = 0,
+    val oldestLogWeight: Weight? = null
 ) {
     val mostRecentLog: Log?
         get() = fiveMostRecentLogs.firstOrNull()
