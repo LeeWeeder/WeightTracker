@@ -173,7 +173,7 @@ fun HomeScreenContent(
                     verticalAlignment = Alignment.Bottom,
                 ) {
                     Text(
-                        text = "57.0",
+                        text = uiState.oldestLogWeight?.displayValue ?: "-",
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.End,
                         style = MaterialTheme.typography.labelMedium,
