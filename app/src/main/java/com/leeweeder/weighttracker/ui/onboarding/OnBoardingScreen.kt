@@ -13,11 +13,13 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,16 +52,38 @@ fun OnBoardingScreen(
     onFinishOnBoarding: (weight: Int) -> Unit
 ) {
     val navController = LocalNavController.current
+    val isValidationDialogVisible = remember {
+        mutableStateOf(false)
+    }
+    val goalWeightState = remember {
+        mutableStateOf("60")
+    }
+    if (isValidationDialogVisible.value) {
+        AlertDialog(
+            onDismissRequest = { isValidationDialogVisible.value = false },
+            confirmButton = {
+                TextButton(onClick = { isValidationDialogVisible.value = false }) {
+                    Text(text = "Okay")
+                }
+            },
+            icon = {
+                Icon(painter = painterResource(id = R.drawable.error), contentDescription = null)
+            },
+            title = {
+                Text(text = "Can't set goal")
+            },
+            text = {
+                Text(text = if (goalWeightState.value.isEmpty()) "Enter a value to set your goal." else "Goal weight must be greater than 0.")
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
             .padding(horizontal = 16.dp)
     ) {
-        val goalWeightState = remember {
-            mutableStateOf("60")
-        }
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(1f)
@@ -117,7 +141,13 @@ fun OnBoardingScreen(
         }
         Button(
             onClick = {
-                onFinishOnBoarding(goalWeightState.value.toInt())
+                val goalWeight = goalWeightState.value
+                if (goalWeight.isEmpty() || goalWeight.toInt() == 0) {
+                    isValidationDialogVisible.value = true
+                    return@Button
+                }
+
+                onFinishOnBoarding(goalWeight.toInt())
                 navController.navigate(Screen.HomeScreen.fromOnBoardingRoute) {
                     popUpTo(Screen.OnBoardingScreen.route) {
                         inclusive = true
