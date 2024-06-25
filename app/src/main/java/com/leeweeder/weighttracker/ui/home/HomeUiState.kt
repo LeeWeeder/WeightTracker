@@ -4,7 +4,7 @@ import com.leeweeder.weighttracker.domain.model.Log
 
 data class HomeUiState(
     val fiveMostRecentLogs: List<Log> = emptyList(),
-    val goalWeight: Float = 0f
+    val goalWeight: Int = 0
 ) {
     val mostRecentLog: Log?
         get() = fiveMostRecentLogs.firstOrNull()

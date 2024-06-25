@@ -47,7 +47,7 @@ fun OnBoardingScreen(
 
 @Composable
 fun OnBoardingScreen(
-    onFinishOnBoarding: (weight: Float) -> Unit
+    onFinishOnBoarding: (weight: Int) -> Unit
 ) {
     val navController = LocalNavController.current
     Column(
@@ -117,7 +117,7 @@ fun OnBoardingScreen(
         }
         Button(
             onClick = {
-                onFinishOnBoarding(goalWeightState.value.toFloat())
+                onFinishOnBoarding(goalWeightState.value.toInt())
                 navController.navigate(Screen.HomeScreen.fromOnBoardingRoute) {
                     popUpTo(Screen.OnBoardingScreen.route) {
                         inclusive = true
