@@ -381,7 +381,7 @@ fun CurrentWeight(uiState: HomeUiState, modifier: Modifier = Modifier) {
             GoalProgressCircle(progress = uiState.goalProgress ?: 0f)
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = mostRecentLog?.date?.format("EEE, MM d", true) ?: "-",
+                    text = mostRecentLog?.date?.format("EEE, MMM d, yyyy", true) ?: "-",
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.outline
                 )
