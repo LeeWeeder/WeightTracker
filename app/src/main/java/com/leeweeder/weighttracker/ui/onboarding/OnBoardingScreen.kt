@@ -9,34 +9,31 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.LocalNavController
-import com.leeweeder.weighttracker.ui.components.NumberKeyBoard
-import com.leeweeder.weighttracker.ui.components.rememberNumberKeyBoardState
-import com.leeweeder.weighttracker.util.MAX_WEIGHT
 import com.leeweeder.weighttracker.util.Screen
 
 @Composable
@@ -56,101 +53,167 @@ fun OnBoardingScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .safeDrawingPadding()
+            .padding(horizontal = 16.dp)
     ) {
-        val goalWeightState =
-            rememberNumberKeyBoardState(maxValue = MAX_WEIGHT)
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "Set your goal!", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(32.dp))
-            ElevatedCard(
-                modifier = Modifier
-                    .padding(horizontal = 32.dp)
-                    .fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(vertical = 32.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.Bottom,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = goalWeightState.value,
-                        style = MaterialTheme.typography.displayLarge.copy(fontSize = (MaterialTheme.typography.displayLarge.fontSize.value + 20).sp),
-                        textAlign = TextAlign.End,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Box {
-                        var isMenuExpanded by remember { mutableStateOf(false) }
-                        var selectedUnit by remember { mutableStateOf("kg") }
-                        TextButton(
-                            onClick = { isMenuExpanded = true },
-                            shape = MaterialTheme.shapes.small,
-                            modifier = Modifier.padding(ButtonDefaults.TextButtonWithIconContentPadding)
-                        ) {
-                            Text(text = selectedUnit)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Icon(
-                                imageVector = Icons.Default.KeyboardArrowDown,
-                                contentDescription = null,
-                                modifier = Modifier.size(ButtonDefaults.IconSize)
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = isMenuExpanded,
-                            onDismissRequest = { isMenuExpanded = false }) {
-                            DropdownMenuItem(
-                                text = { Text(text = "kg") },
-                                onClick = {
-                                    selectedUnit = "kg"
-                                    isMenuExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
+        val goalWeightState = remember {
+            mutableStateOf("60")
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f)
         ) {
-            Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-                Button(
-                    onClick = {
-                        onFinishOnBoarding(goalWeightState.value.toFloat())
-                        navController.navigate(Screen.HomeScreen.fromOnBoardingRoute) {
-                            popUpTo(Screen.OnBoardingScreen.route) {
-                                inclusive = true
-                            }
-                        }
-                    },
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(text = "Finish")
+            Spacer(modifier = Modifier.height(150.dp))
+            GoalWeightTextField(value = goalWeightState.value) {
+                if (it.isEmpty()) {
+                    goalWeightState.value = it
+                    return@GoalWeightTextField
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                val outsidePadding = 16.dp
-                NumberKeyBoard(
-                    state = goalWeightState, modifier = Modifier
-                        .padding(horizontal = outsidePadding)
-                        .padding(bottom = outsidePadding)
+                val value = it.toIntOrNull() ?: return@GoalWeightTextField
+                if (value < 0) return@GoalWeightTextField
+                if (it.length > 3) return@GoalWeightTextField
+                goalWeightState.value = value.toString()
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(text = "KILOGRAMS", style = MaterialTheme.typography.titleLarge)
+            Spacer(modifier = Modifier.height(36.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                ControlButton(
+                    type = ControlButtonType.Decrease,
+                    modifier = Modifier.weight(1f),
+                    position = ControlButtonPosition.Left,
+                    onClick = {
+                        if (goalWeightState.value.isEmpty()) {
+                            goalWeightState.value = "0"
+                            return@ControlButton
+                        }
+                        val value = goalWeightState.value.toInt()
+                        if (value > 0) {
+                            goalWeightState.value = (value - 1).toString()
+                        }
+                    }
+                )
+                ControlButton(
+                    type = ControlButtonType.Increase,
+                    modifier = Modifier.weight(1f),
+                    position = ControlButtonPosition.Right,
+                    onClick = {
+                        if (goalWeightState.value.isEmpty()) {
+                            goalWeightState.value = "1"
+                            return@ControlButton
+                        }
+                        val value = goalWeightState.value.toInt()
+                        val potentialValue = (value + 1).toString()
+                        if (potentialValue.length <= 3) {
+                            goalWeightState.value = potentialValue
+                        }
+                    }
                 )
             }
         }
+        Button(
+            onClick = {
+                onFinishOnBoarding(goalWeightState.value.toFloat())
+                navController.navigate(Screen.HomeScreen.fromOnBoardingRoute) {
+                    popUpTo(Screen.OnBoardingScreen.route) {
+                        inclusive = true
+                    }
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        ) {
+            Text(text = "Set goal")
+        }
     }
+}
+
+enum class ControlButtonType {
+    Increase,
+    Decrease
+}
+
+enum class ControlButtonPosition {
+    Left,
+    Right
+}
+
+@Composable
+private fun ControlButton(
+    type: ControlButtonType,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    position: ControlButtonPosition
+) {
+    val largeShapeRadius = 16.dp
+    val smallShapeRadius = 2.dp
+    val leftShape = RoundedCornerShape(
+        topStart = largeShapeRadius,
+        topEnd = smallShapeRadius,
+        bottomStart = largeShapeRadius,
+        bottomEnd = smallShapeRadius
+    )
+    val rightShape = RoundedCornerShape(
+        topStart = smallShapeRadius,
+        topEnd = largeShapeRadius,
+        bottomStart = smallShapeRadius,
+        bottomEnd = largeShapeRadius
+    )
+    val shape = when (position) {
+        ControlButtonPosition.Left -> leftShape
+        ControlButtonPosition.Right -> rightShape
+    }
+    ElevatedButton(
+        onClick = onClick, modifier = modifier
+            .height(70.dp),
+        shape = shape
+    ) {
+        Icon(
+            painter = painterResource(
+                id = when (type) {
+                    ControlButtonType.Increase -> R.drawable.add
+                    ControlButtonType.Decrease -> R.drawable.remove
+                }
+            ),
+            contentDescription = "${type.name} goal weight value by one"
+        )
+    }
+}
+
+@Composable
+private fun GoalWeightTextField(value: String, onValueChange: (String) -> Unit) {
+    val fontSize = (MaterialTheme.typography.displayLarge.fontSize.value + 36f).sp
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        textStyle = MaterialTheme.typography.displayLarge.copy(
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Medium,
+            fontSize = fontSize,
+            textAlign = TextAlign.Center
+        ),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        cursorBrush = if (value.isEmpty()) SolidColor(Color.Unspecified) else SolidColor(
+            MaterialTheme.colorScheme.primary
+        ),
+        decorationBox = { innerTextField ->
+            Box(contentAlignment = Alignment.Center) {
+                if (value.isEmpty()) {
+                    Text(
+                        text = "Goal weight",
+                        style = MaterialTheme.typography.displayMedium,
+                        color = MaterialTheme.colorScheme.outline,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                innerTextField()
+            }
+        }
+    )
 }
