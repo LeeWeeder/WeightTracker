@@ -192,7 +192,7 @@ fun HomeScreenContent(
             }
         }
         item {
-            val differenceFromGoal = uiState.differenceFromGoal
+            val differenceFromGoal = uiState.mostRecentDifferenceFromGoal
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(
                     text = differenceFromGoal?.absoluteValue?.let {
@@ -377,7 +377,8 @@ fun CurrentWeight(uiState: HomeUiState, modifier: Modifier = Modifier) {
         SectionLabel(title = "Current weight", modifier = Modifier.padding(top = 16.dp))
         Spacer(modifier = Modifier.height(16.dp))
         Box(contentAlignment = Alignment.BottomCenter) {
-            GoalProgressCircle(progress = 0f)
+            android.util.Log.d("Value", uiState.goalProgress.toString())
+            GoalProgressCircle(progress = uiState.goalProgress ?: 0f)
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = mostRecentLog?.date?.format("EEE, MM d", true) ?: "-",
@@ -414,7 +415,7 @@ private fun SectionLabel(title: String, modifier: Modifier = Modifier) {
 @Composable
 private fun TrendIndicator(uiState: HomeUiState, modifier: Modifier = Modifier) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
-        val difference = uiState.differenceFromPrevious
+        val difference = uiState.mostRecentDifferenceFromPrevious
         Text(
             text = difference?.let { it.formatToOneDecimalPlace(showPlusSign = true) + " kg" }
                 ?: "-",
