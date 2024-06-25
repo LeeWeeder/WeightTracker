@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.leeweeder.weighttracker.domain.repository.DataStoreRepository
 import kotlinx.coroutines.flow.Flow
@@ -18,26 +18,26 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "we
 
 class DataStoreRepositoryImpl(context: Context): DataStoreRepository {
     private object PreferencesKey {
-        val goalWeightKey = floatPreferencesKey(name = "GOAL_WEIGHT")
+        val goalWeightKey = intPreferencesKey(name = "GOAL_WEIGHT")
         val shouldHideOnBoardingKey = booleanPreferencesKey(name = "ONBOARDING")
     }
 
     private val dataStore = context.dataStore
 
-    override suspend fun saveGoalWeight(value: Float) {
+    override suspend fun saveGoalWeight(value: Int) {
         dataStore.edit { preferences ->
             preferences[PreferencesKey.goalWeightKey] = value
         }
     }
 
-    override fun readGoalWeightState(): Flow<Float> {
+    override fun readGoalWeightState(): Flow<Int> {
         return dataStore.data
             .catch { exception ->
                 if (exception is IOException) emit(emptyPreferences())
                 else throw exception
             }
             .map { preferences ->
-                val goalWeightState = preferences[PreferencesKey.goalWeightKey] ?: 0f
+                val goalWeightState = preferences[PreferencesKey.goalWeightKey] ?: 0
                 goalWeightState
             }
     }

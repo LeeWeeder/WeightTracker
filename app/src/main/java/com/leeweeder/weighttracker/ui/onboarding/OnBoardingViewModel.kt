@@ -11,12 +11,12 @@ import javax.inject.Inject
 class OnBoardingViewModel @Inject constructor(
     private val dataStoreUseCases: DataStoreUseCases
 ) : ViewModel() {
-    fun onFinishOnBoarding (weight: Float) {
+    fun onFinishOnBoarding (weight: Int) {
         setGoalWeight(weight)
         hideOnBoarding()
     }
 
-    private fun setGoalWeight(weight: Float) {
+    private fun setGoalWeight(weight: Int) {
         viewModelScope.launch {
             dataStoreUseCases.saveGoalWeight(weight)
         }

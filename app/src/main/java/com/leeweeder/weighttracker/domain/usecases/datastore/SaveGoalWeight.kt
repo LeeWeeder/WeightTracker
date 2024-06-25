@@ -5,7 +5,7 @@ import com.leeweeder.weighttracker.domain.repository.DataStoreRepository
 class SaveGoalWeight(
     private val repository: DataStoreRepository
 ) {
-    suspend operator fun invoke(value: Float) {
+    suspend operator fun invoke(value: Int) {
         repository.saveGoalWeight(value)
     }
 }
