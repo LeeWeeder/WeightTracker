@@ -134,6 +134,7 @@ dependencies {
 
     // Datastore
     implementation(libs.datastore)
+    implementation(libs.datastore.proto)
 
     // Splashscreen
     implementation(libs.androidx.core.splashscreen)
