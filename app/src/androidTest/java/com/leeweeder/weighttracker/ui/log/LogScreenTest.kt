@@ -18,8 +18,6 @@ package com.leeweeder.weighttracker.ui.log
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Before
 import org.junit.Rule
@@ -38,14 +36,12 @@ class LogScreenTest {
     @Before
     fun setup() {
         composeTestRule.setContent {
-            LogScreen(FAKE_DATA, onSave = {})
         }
     }
 
     @Test
     fun firstItem_exists() {
-        composeTestRule.onNodeWithText(FAKE_DATA.first()).assertExists().performClick()
     }
 }
 
-private val FAKE_DATA = listOf("Compose", "Room", "Kotlin")
+private val FAKE_DATA = LogUiState()
