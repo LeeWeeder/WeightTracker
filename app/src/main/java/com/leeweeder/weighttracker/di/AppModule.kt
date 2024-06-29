@@ -23,7 +23,6 @@ import com.leeweeder.weighttracker.domain.usecases.log.GetLogById
 import com.leeweeder.weighttracker.domain.usecases.log.GetLogs
 import com.leeweeder.weighttracker.domain.usecases.log.GetOldestLogWeight
 import com.leeweeder.weighttracker.domain.usecases.log.InsertLog
-import com.leeweeder.weighttracker.domain.usecases.log.IsOlderThanAll
 import com.leeweeder.weighttracker.domain.usecases.log.UpdateLog
 import dagger.Module
 import dagger.Provides
@@ -62,8 +61,7 @@ object AppModule {
             deleteLogById = DeleteLogById(repository),
             getFiveMostRecentLogs = GetFiveMostRecentLogs(repository),
             getLogByDate = GetLogByDate(repository),
-            getOldestLogWeight = GetOldestLogWeight(repository),
-            isOlderThanAll = IsOlderThanAll(repository)
+            getOldestLogWeight = GetOldestLogWeight(repository)
         )
     }
 

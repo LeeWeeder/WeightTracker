@@ -29,10 +29,6 @@ class LogRepositoryImpl(
         return dao.getLogByDate(millis)
     }
 
-    override suspend fun isOlderThanAll(millis: Long): Boolean {
-        return dao.isOlderThanAll(millis)
-    }
-
     override suspend fun insertLog(log: Log): Long {
         return dao.insertLog(log)
     }
