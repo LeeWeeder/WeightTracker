@@ -194,24 +194,32 @@ fun HomeScreenContent(
         item {
             val differenceFromGoal = uiState.mostRecentDifferenceFromGoal
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = differenceFromGoal?.absoluteValue?.let {
-                        it.formatToOneDecimalPlace() + " kg " + if (differenceFromGoal > 0) {
-                            "left to gain"
-                        } else {
-                            "left to lose"
+                if (differenceFromGoal?.toInt() == 0) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.check_small),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.tertiary
+                    )
+                } else {
+                    Text(
+                        text = differenceFromGoal?.absoluteValue?.let {
+                            it.formatToOneDecimalPlace() + " kg " + if (differenceFromGoal > 0) {
+                                "left to gain"
+                            } else {
+                                "left to lose"
+                            }
                         }
-                    }
-                        ?: "-",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.tertiary,
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.tertiaryContainer,
-                            shape = MaterialTheme.shapes.extraSmall
-                        )
-                        .padding(horizontal = 4.dp)
-                )
+                            ?: "-",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.tertiaryContainer,
+                                shape = MaterialTheme.shapes.extraSmall
+                            )
+                            .padding(horizontal = 4.dp)
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(8.dp))
         }
