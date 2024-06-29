@@ -6,11 +6,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leeweeder.weighttracker.domain.model.Log
+import com.leeweeder.weighttracker.domain.usecases.DataStoreUseCases
 import com.leeweeder.weighttracker.domain.usecases.LogUseCases
 import com.leeweeder.weighttracker.ui.util.epochMillisToLocalDate
+import com.leeweeder.weighttracker.ui.util.toEpochMilli
+import com.leeweeder.weighttracker.util.StartingWeightModel
 import com.leeweeder.weighttracker.util.Weight
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 const val LOG_ID_KEY = "logId"
@@ -18,6 +23,7 @@ const val LOG_ID_KEY = "logId"
 @HiltViewModel
 class AddEditLogViewModel @Inject constructor(
     private val logUseCases: LogUseCases,
+    private val dataStoreUseCases: DataStoreUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _addEditLogUiState = mutableStateOf(AddEditLogUiState())
@@ -40,6 +46,31 @@ class AddEditLogViewModel @Inject constructor(
                 }
             }
         }
+        viewModelScope.launch {
+            dataStoreUseCases.readStartingWeightState().collectLatest { startingWeight ->
+                _addEditLogUiState.value = addEditLogUiState.value.copy(
+                    startingWeight = StartingWeightModel(
+                        startingWeight.weight,
+                        startingWeight.date,
+                        startingWeight.wasGoalAchieved
+                    )
+                )
+            }
+        }
+        viewModelScope.launch {
+            dataStoreUseCases.readGoalWeightState().collectLatest { goalWeight ->
+                _addEditLogUiState.value = addEditLogUiState.value.copy(
+                    goalWeight = goalWeight
+                )
+            }
+        }
+        viewModelScope.launch {
+            logUseCases.getFiveMostRecentLogs().collectLatest { logs ->
+                _addEditLogUiState.value = addEditLogUiState.value.copy(
+                    mostRecentLog = logs.firstOrNull()
+                )
+            }
+        }
     }
 
     fun onEvent(event: AddEditLogEvent) {
@@ -52,21 +83,41 @@ class AddEditLogViewModel @Inject constructor(
             }
 
             AddEditLogEvent.SaveLog -> {
-                val weight = addEditLogUiState.value.weight
-                val currentLogId = addEditLogUiState.value.currentLogId
-                val date = addEditLogUiState.value.date
+                val uiState = addEditLogUiState.value
+                val currentWeight = uiState.weight
+                val currentLogId = uiState.currentLogId
+                val currentDate = uiState.date
+                val goalWeight = uiState.goalWeight!!
+                val startingWeight = uiState.startingWeight
 
-                if (currentLogId != -1) {
-                    val log = Log(id = currentLogId, weight = weight, date = date)
-                    viewModelScope.launch {
+                viewModelScope.launch {
+                    if (shouldUpdateStartingWeight(
+                            startingWeight = startingWeight!!,
+                            currentDate = currentDate,
+                            goalWeight = goalWeight,
+                            mostRecentLog = uiState.mostRecentLog
+                        )
+                    ) {
+                        dataStoreUseCases.saveStartingWeight(
+                            StartingWeightModel(
+                                weight = currentWeight.value,
+                                date = currentDate.toEpochMilli()
+                            )
+                        )
+                    }
+
+                    if (currentWeight.value == goalWeight.toFloat()) dataStoreUseCases.saveStartingWeight(
+                        startingWeight.copy(wasGoalAchieved = true)
+                    )
+
+                    if (currentLogId != -1) {
+                        val log = Log(id = currentLogId, weight = currentWeight, date = currentDate)
                         logUseCases.updateLog(
                             log = log
                         )
                         _newlyAddedId.value = currentLogId.toLong()
-                    }
-                } else {
-                    val log = Log(weight = weight, date = date)
-                    viewModelScope.launch {
+                    } else {
+                        val log = Log(weight = currentWeight, date = currentDate)
                         _newlyAddedId.value = logUseCases.insertLog(
                             log = log
                         )
@@ -92,5 +143,20 @@ class AddEditLogViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun shouldUpdateStartingWeight(
+        startingWeight: StartingWeightModel,
+        currentDate: LocalDate,
+        goalWeight: Int,
+        mostRecentLog: Log?
+    ): Boolean {
+        val isFirstTime =
+            startingWeight.weight == 0f && startingWeight.date == 0L && startingWeight.wasGoalAchieved == false
+        val goalWasAchieved = startingWeight.wasGoalAchieved
+        val startingWeightDate = startingWeight.date?.let { epochMillisToLocalDate(it) }
+        return isFirstTime
+                || goalWasAchieved == true && (mostRecentLog != null && mostRecentLog.weight.value.toInt() == goalWeight)
+                || (currentDate <= startingWeightDate)
     }
 }
