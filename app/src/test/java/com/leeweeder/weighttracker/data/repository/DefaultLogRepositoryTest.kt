@@ -1,6 +1,5 @@
 package com.leeweeder.weighttracker.data.repository
 
-import com.leeweeder.weighttracker.data.datasource.IsoLocalDate
 import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.domain.repository.LogRepository
 import com.leeweeder.weighttracker.util.Weight
@@ -27,7 +26,7 @@ class FakeLogRepository @Inject constructor() : LogRepository {
         return logs.find { it.id == id }!!
     }
 
-    override suspend fun getLogByDate(date: IsoLocalDate): Log {
+    override suspend fun getLogByDate(millis: Long): Log {
         TODO("Not yet implemented")
     }
 
