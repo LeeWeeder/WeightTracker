@@ -3,10 +3,10 @@ package com.leeweeder.weighttracker.domain.usecases
 import com.leeweeder.weighttracker.data.repository.FakeLogRepository
 import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.domain.usecases.log.GetLogs
-import com.leeweeder.weighttracker.ui.util.Weight
+import com.leeweeder.weighttracker.util.Weight
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
-import java.time.Instant
+import java.time.LocalDate
 
 class GetLogsTest {
 
@@ -22,8 +22,8 @@ class GetLogsTest {
         (1..26).forEachIndexed { _, n ->
             logsToInsert.add(
                 Log(
-                    date = Instant.now(),
-                    weight = Weight(n, n, n)
+                    date = LocalDate.now(),
+                    weight = Weight(0f)
                 )
             )
         }

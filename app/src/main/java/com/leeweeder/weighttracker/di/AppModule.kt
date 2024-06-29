@@ -12,8 +12,10 @@ import com.leeweeder.weighttracker.domain.usecases.DataStoreUseCases
 import com.leeweeder.weighttracker.domain.usecases.LogUseCases
 import com.leeweeder.weighttracker.domain.usecases.datastore.ReadGoalWeightState
 import com.leeweeder.weighttracker.domain.usecases.datastore.ReadOnBoardingState
+import com.leeweeder.weighttracker.domain.usecases.datastore.ReadStartingWeightState
 import com.leeweeder.weighttracker.domain.usecases.datastore.SaveGoalWeight
 import com.leeweeder.weighttracker.domain.usecases.datastore.SaveShouldHideOnBoarding
+import com.leeweeder.weighttracker.domain.usecases.datastore.SaveStartingWeight
 import com.leeweeder.weighttracker.domain.usecases.log.DeleteLogById
 import com.leeweeder.weighttracker.domain.usecases.log.GetFiveMostRecentLogs
 import com.leeweeder.weighttracker.domain.usecases.log.GetLogByDate
@@ -76,7 +78,9 @@ object AppModule {
             saveGoalWeight = SaveGoalWeight(repository),
             readGoalWeightState = ReadGoalWeightState(repository),
             saveShouldHideOnBoarding = SaveShouldHideOnBoarding(repository),
-            readOnBoardingState = ReadOnBoardingState(repository)
+            readOnBoardingState = ReadOnBoardingState(repository),
+            saveStartingWeight = SaveStartingWeight(repository),
+            readStartingWeightState = ReadStartingWeightState(repository)
         )
     }
 }
