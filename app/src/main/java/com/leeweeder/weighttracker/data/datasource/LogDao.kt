@@ -26,6 +26,9 @@ interface LogDao {
     @Query("SELECT * FROM log WHERE date = :millis")
     suspend fun getLogByDate(millis: Long): Log
 
+    @Query("SELECT CASE WHEN (SELECT MIN(date) FROM log) IS NULL OR :millis < (SELECT MIN(date) FROM log) THEN 1 ELSE 0 END")
+    suspend fun isOlderThanAll(millis: Long): Boolean
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLog(log: Log): Long
 
