@@ -1,7 +1,7 @@
 package com.leeweeder.weighttracker.domain.repository
 
 import com.leeweeder.weighttracker.StartingWeight
-import com.leeweeder.weighttracker.domain.model.Log
+import com.leeweeder.weighttracker.util.StartingWeightModel
 import kotlinx.coroutines.flow.Flow
 
 interface DataStoreRepository {
@@ -12,5 +12,5 @@ interface DataStoreRepository {
     suspend fun saveShouldHideOnBoarding(shouldHideOnBoarding: Boolean)
     fun readOnBoardingState(): Flow<Boolean>
 
-    suspend fun saveStartingWeight(log: Log)
+    suspend fun saveStartingWeight(startingWeight: StartingWeightModel)
 }

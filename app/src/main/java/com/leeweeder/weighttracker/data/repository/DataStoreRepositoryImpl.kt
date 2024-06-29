@@ -13,14 +13,13 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.protobuf.InvalidProtocolBufferException
 import com.leeweeder.weighttracker.StartingWeight
-import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.domain.repository.DataStoreRepository
+import com.leeweeder.weighttracker.util.StartingWeightModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.InputStream
 import java.io.OutputStream
-import java.time.format.DateTimeFormatter
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "weight_tracker")
 val Context.startingWeightDataStore: DataStore<StartingWeight> by dataStore(
@@ -82,10 +81,19 @@ class DataStoreRepositoryImpl(context: Context) : DataStoreRepository {
             }
     }
 
-    override suspend fun saveStartingWeight(log: Log) {
+    override suspend fun saveStartingWeight(startingWeight: StartingWeightModel) {
         startingWeightDataStore.updateData { preferences ->
-            preferences.toBuilder().setWeight(log.weight.value)
-                .setDate(log.date.format(DateTimeFormatter.ISO_LOCAL_DATE)).build()
+            val preferencesBuilder = preferences.toBuilder()
+            if (startingWeight.weight != null) {
+                preferencesBuilder.setWeight(startingWeight.weight)
+            }
+            if (startingWeight.date != null) {
+                preferencesBuilder.setDate(startingWeight.date)
+            }
+            if (startingWeight.wasGoalAchieved != null) {
+                preferencesBuilder.setWasGoalAchieved(startingWeight.wasGoalAchieved)
+            }
+            preferencesBuilder.build()
         }
     }
 }
