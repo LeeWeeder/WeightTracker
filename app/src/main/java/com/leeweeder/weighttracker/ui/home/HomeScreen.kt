@@ -173,7 +173,7 @@ fun HomeScreenContent(
                     verticalAlignment = Alignment.Bottom,
                 ) {
                     Text(
-                        text = uiState.oldestLogWeight?.displayValue ?: "-",
+                        text = uiState.startingWeight?.weight?.formatToOneDecimalPlace() ?: "-",
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.End,
                         style = MaterialTheme.typography.labelMedium,
@@ -377,7 +377,6 @@ fun CurrentWeight(uiState: HomeUiState, modifier: Modifier = Modifier) {
         SectionLabel(title = "Current weight", modifier = Modifier.padding(top = 16.dp))
         Spacer(modifier = Modifier.height(16.dp))
         Box(contentAlignment = Alignment.BottomCenter) {
-            android.util.Log.d("Value", uiState.goalProgress.toString())
             GoalProgressCircle(progress = uiState.goalProgress ?: 0f)
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leeweeder.weighttracker.domain.usecases.DataStoreUseCases
 import com.leeweeder.weighttracker.domain.usecases.LogUseCases
+import com.leeweeder.weighttracker.util.StartingWeightModel
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -35,6 +36,17 @@ class HomeViewModel @Inject constructor(
             dataStoreUseCases.readGoalWeightState().collectLatest { goalWeight ->
                 _homeUiState.value = homeUiState.value.copy(
                     goalWeight = goalWeight
+                )
+            }
+        }
+        viewModelScope.launch {
+            dataStoreUseCases.readStartingWeightState().collectLatest { startingWeight ->
+                _homeUiState.value = homeUiState.value.copy(
+                    startingWeight = if (startingWeight.weight == 0f && !startingWeight.wasGoalAchieved && startingWeight.date == 0L) StartingWeightModel() else StartingWeightModel(
+                        weight = startingWeight.weight,
+                        date = startingWeight.date,
+                        wasGoalAchieved = startingWeight.wasGoalAchieved
+                    )
                 )
             }
         }
