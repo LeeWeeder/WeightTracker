@@ -1,9 +1,10 @@
 package com.leeweeder.weighttracker.data.datasource
 
 import androidx.room.TypeConverter
+import com.leeweeder.weighttracker.ui.util.epochMillisToLocalDate
+import com.leeweeder.weighttracker.ui.util.toEpochMilli
 import com.leeweeder.weighttracker.util.Weight
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class Converters {
     @TypeConverter
@@ -17,12 +18,12 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromLocalDate(date: LocalDate): String {
-        return date.format(DateTimeFormatter.ISO_LOCAL_DATE)
+    fun fromLocalDate(date: LocalDate): Long {
+        return date.toEpochMilli()
     }
 
     @TypeConverter
-    fun toLocalDate(value: String): LocalDate {
-        return LocalDate.parse(value)
+    fun toLocalDate(value: Long): LocalDate {
+        return epochMillisToLocalDate(value)
     }
 }
