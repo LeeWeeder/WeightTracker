@@ -95,7 +95,8 @@ class AddEditLogViewModel @Inject constructor(
                             startingWeight = startingWeight!!,
                             currentDate = currentDate,
                             goalWeight = goalWeight,
-                            mostRecentLog = uiState.mostRecentLog
+                            mostRecentLog = uiState.mostRecentLog,
+                            currentWeight = currentWeight.value
                         )
                     ) {
                         dataStoreUseCases.saveStartingWeight(
@@ -144,19 +145,21 @@ class AddEditLogViewModel @Inject constructor(
             }
         }
     }
+}
 
-    private fun shouldUpdateStartingWeight(
-        startingWeight: StartingWeightModel,
-        currentDate: LocalDate,
-        goalWeight: Int,
-        mostRecentLog: Log?
-    ): Boolean {
-        val isFirstTime =
-            startingWeight.weight == 0f && startingWeight.date == 0L && startingWeight.wasGoalAchieved == false
-        val goalWasAchieved = startingWeight.wasGoalAchieved
-        val startingWeightDate = startingWeight.date?.let { epochMillisToLocalDate(it) }
-        return isFirstTime
-                || goalWasAchieved == true && (mostRecentLog != null && mostRecentLog.weight.value.toInt() == goalWeight)
-                || (currentDate <= startingWeightDate)
-    }
+fun shouldUpdateStartingWeight(
+    startingWeight: StartingWeightModel,
+    currentDate: LocalDate,
+    goalWeight: Int,
+    mostRecentLog: Log?,
+    currentWeight: Float
+): Boolean {
+    val isFirstTime =
+        startingWeight.weight == 0f && startingWeight.date == 0L && startingWeight.wasGoalAchieved == false
+    val goalWasAchieved = startingWeight.wasGoalAchieved
+    val startingWeightDate = startingWeight.date?.let { epochMillisToLocalDate(it) }
+    val goalWeightFloat = goalWeight.toFloat()
+    return isFirstTime
+            || goalWasAchieved == true && ((mostRecentLog != null && mostRecentLog.weight.value == goalWeightFloat) || currentWeight == goalWeightFloat)
+            || (currentDate <= startingWeightDate)
 }
