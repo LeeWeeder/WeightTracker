@@ -385,7 +385,6 @@ fun CurrentWeight(uiState: HomeUiState, modifier: Modifier = Modifier) {
         SectionLabel(title = "Current weight", modifier = Modifier.padding(top = 16.dp))
         Spacer(modifier = Modifier.height(16.dp))
         Box(contentAlignment = Alignment.BottomCenter) {
-            android.util.Log.d("Goal progress value", "${uiState.goalProgress}")
             GoalProgressCircle(progress = uiState.goalProgress ?: 0f)
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
