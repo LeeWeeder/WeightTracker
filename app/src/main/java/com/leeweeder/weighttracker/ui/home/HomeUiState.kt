@@ -35,9 +35,9 @@ data class HomeUiState(
                     (startingWeight.weight.minus(mostRecentLog!!.weight.value)).absoluteValue
                 val goalWeightDifferenceFromStartingWeight =
                     (goalWeight - startingWeight.weight).absoluteValue
-                val value = startingWeightDifferenceFromCurrentWeight.div(
+                val value = if (goalWeightDifferenceFromStartingWeight != 0f) startingWeightDifferenceFromCurrentWeight.div(
                     goalWeightDifferenceFromStartingWeight
-                )
+                ) else 1f
                 if (value >= 1f) 1f else value
             } else {
                 null
