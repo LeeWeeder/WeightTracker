@@ -91,6 +91,10 @@ class AddEditLogViewModel @Inject constructor(
                 val startingWeight = uiState.startingWeight
 
                 viewModelScope.launch {
+                    if (currentWeight.value == goalWeight.toFloat()) dataStoreUseCases.saveStartingWeight(
+                        StartingWeightModel(wasGoalAchieved = true)
+                    )
+
                     if (shouldUpdateStartingWeight(
                             startingWeight = startingWeight!!,
                             currentDate = currentDate,
@@ -106,10 +110,6 @@ class AddEditLogViewModel @Inject constructor(
                             )
                         )
                     }
-
-                    if (currentWeight.value == goalWeight.toFloat()) dataStoreUseCases.saveStartingWeight(
-                        startingWeight.copy(wasGoalAchieved = true)
-                    )
 
                     if (currentLogId != -1) {
                         val log = Log(id = currentLogId, weight = currentWeight, date = currentDate)
