@@ -165,7 +165,10 @@ fun HomeScreenContent(
                             title = "Goal",
                             color = MaterialTheme.colorScheme.onTertiaryContainer
                         )
-                        Text(text = uiState.goalWeight.toString(), style = MaterialTheme.typography.headlineSmall)
+                        Text(
+                            text = uiState.goalWeight.toString(),
+                            style = MaterialTheme.typography.headlineSmall
+                        )
                     }
                 }
             }
@@ -174,12 +177,17 @@ fun HomeScreenContent(
             val differenceFromGoal = uiState.mostRecentDifferenceFromGoal
             Spacer(modifier = Modifier.height(16.dp))
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                val textStyle = MaterialTheme.typography.labelMedium
+                val color = MaterialTheme.colorScheme.secondary
                 if (differenceFromGoal?.toInt() == 0) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.check_small),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.check_small),
+                            contentDescription = null,
+                            tint = color
+                        )
+                        Text(text = "Stay consistent!", style = textStyle, color = color)
+                    }
                 } else {
                     Text(
                         text = differenceFromGoal?.absoluteValue?.let {
@@ -190,8 +198,8 @@ fun HomeScreenContent(
                             }
                         }
                             ?: "-",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.secondary
+                        style = textStyle,
+                        color = color
                     )
                 }
             }
