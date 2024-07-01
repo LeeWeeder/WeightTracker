@@ -17,15 +17,12 @@
 package com.leeweeder.weighttracker.domain.repository
 
 import com.leeweeder.weighttracker.domain.model.Log
-import com.leeweeder.weighttracker.util.Weight
 import kotlinx.coroutines.flow.Flow
 
 interface LogRepository {
     fun getLogs(): Flow<List<Log>>
 
     fun getFiveMostRecentLogs(): Flow<List<Log>>
-
-    fun getOldestLogWeight(): Flow<Weight?>
 
     suspend fun getLogById(id: Int): Log
 

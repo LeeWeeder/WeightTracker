@@ -6,7 +6,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.leeweeder.weighttracker.domain.model.Log
-import com.leeweeder.weighttracker.util.Weight
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -16,9 +15,6 @@ interface LogDao {
 
     @Query("SELECT * FROM log ORDER BY date DESC LIMIT 5")
     fun getFiveMostRecentLogs(): Flow<List<Log>>
-
-    @Query("SELECT weight FROM log ORDER BY date ASC LIMIT 1")
-    fun getOldestLogWeight(): Flow<Weight?>
 
     @Query("SELECT * FROM log WHERE id = :id")
     suspend fun getLogById(id: Int): Log

@@ -20,8 +20,6 @@ ksp = "1.9.24-1.0.20"
 vico = "1.14.0"
 datastore = "1.1.1"
 splashscreen = "1.0.1"
-protobufJavaLite = "4.27.2"
-protobuf = "0.9.4"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
@@ -58,8 +56,6 @@ vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 vico-core = { group = "com.patrykandpatrick.vico", name = "core", version.ref = "vico" }
 datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
-datastore-proto = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
-protobuf-javalite = { group = "com.google.protobuf", name = "protobuf-javalite", version.ref = "protobufJavaLite" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -67,4 +63,3 @@ android-library = { id = "com.android.library", version.ref = "androidGradlePlug
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt-gradle = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-protobuf = { id = "com.google.protobuf", version.ref = "protobuf" }

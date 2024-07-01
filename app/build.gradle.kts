@@ -1,5 +1,3 @@
-import com.google.protobuf.gradle.id
-
 /*
  * Copyright (C) 2022 The Android Open Source Project
  *
@@ -21,7 +19,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -140,26 +137,7 @@ dependencies {
 
     // Datastore
     implementation(libs.datastore)
-    implementation(libs.datastore.proto)
 
     // Splashscreen
     implementation(libs.androidx.core.splashscreen)
-
-    implementation(libs.protobuf.javalite)
-}
-
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:${libs.versions.protobufJavaLite.get()}"
-    }
-
-    generateProtoTasks {
-        all().forEach { task ->
-            task.builtins {
-                id("java") {
-                    option("lite")
-                }
-            }
-        }
-    }
 }

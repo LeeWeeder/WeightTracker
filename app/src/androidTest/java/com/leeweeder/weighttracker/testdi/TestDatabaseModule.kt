@@ -12,16 +12,13 @@ import com.leeweeder.weighttracker.domain.usecases.DataStoreUseCases
 import com.leeweeder.weighttracker.domain.usecases.LogUseCases
 import com.leeweeder.weighttracker.domain.usecases.datastore.ReadGoalWeightState
 import com.leeweeder.weighttracker.domain.usecases.datastore.ReadOnBoardingState
-import com.leeweeder.weighttracker.domain.usecases.datastore.ReadStartingWeightState
 import com.leeweeder.weighttracker.domain.usecases.datastore.SaveGoalWeight
 import com.leeweeder.weighttracker.domain.usecases.datastore.SaveShouldHideOnBoarding
-import com.leeweeder.weighttracker.domain.usecases.datastore.SaveStartingWeight
 import com.leeweeder.weighttracker.domain.usecases.log.DeleteLogById
 import com.leeweeder.weighttracker.domain.usecases.log.GetFiveMostRecentLogs
 import com.leeweeder.weighttracker.domain.usecases.log.GetLogByDate
 import com.leeweeder.weighttracker.domain.usecases.log.GetLogById
 import com.leeweeder.weighttracker.domain.usecases.log.GetLogs
-import com.leeweeder.weighttracker.domain.usecases.log.GetOldestLogWeight
 import com.leeweeder.weighttracker.domain.usecases.log.InsertLog
 import com.leeweeder.weighttracker.domain.usecases.log.UpdateLog
 import dagger.Module
@@ -60,8 +57,7 @@ object TestAppModule {
             deleteLogById = DeleteLogById(repository),
             updateLog = UpdateLog(repository),
             getFiveMostRecentLogs = GetFiveMostRecentLogs(repository),
-            getLogByDate = GetLogByDate(repository),
-            getOldestLogWeight = GetOldestLogWeight(repository)
+            getLogByDate = GetLogByDate(repository)
         )
     }
 
@@ -78,9 +74,7 @@ object TestAppModule {
             saveGoalWeight = SaveGoalWeight(repository),
             readGoalWeightState = ReadGoalWeightState(repository),
             saveShouldHideOnBoarding = SaveShouldHideOnBoarding(repository),
-            readOnBoardingState = ReadOnBoardingState(repository),
-            saveStartingWeight = SaveStartingWeight(repository),
-            readStartingWeightState = ReadStartingWeightState(repository)
+            readOnBoardingState = ReadOnBoardingState(repository)
         )
     }
 }
