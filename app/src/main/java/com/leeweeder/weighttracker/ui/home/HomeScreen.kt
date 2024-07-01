@@ -16,8 +16,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,11 +37,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,7 +49,6 @@ import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.MainActivityViewModel
-import com.leeweeder.weighttracker.ui.components.GoalProgressCircle
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.ui.util.formatToOneDecimalPlace
 import com.leeweeder.weighttracker.util.Screen
@@ -147,58 +148,37 @@ fun HomeScreenContent(
     ) {
         item { WeightTrackerTopAppBar() }
         item {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.BottomCenter
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.Bottom,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                val currentWeightWidth = remember { mutableStateOf(0.dp) }
-                val density = LocalDensity.current
-
                 CurrentWeight(
-                    uiState = uiState,
-                    modifier = Modifier.onGloballyPositioned {
-                        currentWeightWidth.value = with(density) {
-                            it.size.width.toDp()
-                        }
-                    }
+                    uiState = uiState
                 )
-
-                val offset = 16.dp
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .offset(y = -offset),
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.Bottom,
+                Card(
+                    shape = MaterialTheme.shapes.extraLarge,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
                 ) {
-                    Text(
-                        text = uiState.startingWeight?.weight?.formatToOneDecimalPlace() ?: "-",
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.End,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                    Spacer(
-                        modifier = Modifier.width(currentWeightWidth.value - 40.dp)
-                    )
-                    Text(
-                        text = uiState.goalWeight.toString(),
-                        modifier = Modifier.weight(1f),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.outline
-                    )
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        SectionLabel(
+                            title = "Goal",
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                        Text(text = uiState.goalWeight.toString(), style = MaterialTheme.typography.headlineSmall)
+                    }
                 }
             }
         }
         item {
             val differenceFromGoal = uiState.mostRecentDifferenceFromGoal
+            Spacer(modifier = Modifier.height(16.dp))
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 if (differenceFromGoal?.toInt() == 0) {
                     Icon(
                         painter = painterResource(id = R.drawable.check_small),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.tertiary
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 } else {
                     Text(
@@ -210,18 +190,12 @@ fun HomeScreenContent(
                             }
                         }
                             ?: "-",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.tertiary,
-                        modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colorScheme.tertiaryContainer,
-                                shape = MaterialTheme.shapes.extraSmall
-                            )
-                            .padding(horizontal = 4.dp)
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
         item {
             LineChart(data = uiState.fiveMostRecentLogs, modelProducer = modelProducer)
@@ -379,62 +353,86 @@ fun LineChart(data: List<Log>, modelProducer: ChartEntryModelProducer) {
 }
 
 @Composable
-fun CurrentWeight(uiState: HomeUiState, modifier: Modifier = Modifier) {
+fun CurrentWeight(uiState: HomeUiState) {
     val mostRecentLog = uiState.mostRecentLog
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
-        SectionLabel(title = "Current weight", modifier = Modifier.padding(top = 16.dp))
-        Spacer(modifier = Modifier.height(16.dp))
-        Box(contentAlignment = Alignment.BottomCenter) {
-            GoalProgressCircle(progress = uiState.goalProgress ?: 0f)
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
+            .padding(top = 32.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .background(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = CircleShape
+                )
+                .size(170.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(bottom = 6.dp),
+                contentAlignment = Alignment.BottomCenter
+            ) {
                 Text(
                     text = mostRecentLog?.date?.format("EEE, MMM d, yyyy", true) ?: "-",
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-                Text(
-                    text = mostRecentLog?.weight?.displayValue ?: "-",
-                    style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.SemiBold),
-                    color = MaterialTheme.colorScheme.primary
+            }
+            Text(
+                text = mostRecentLog?.weight?.displayValue ?: "-",
+                style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.SemiBold),
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.weight(1f)
+            )
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .offset(y = (-8).dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
+                Spacer(modifier = Modifier.height(10.dp))
+                TrendIndicator(
+                    uiState = uiState
                 )
-                Text(
-                    text = "kg",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                TrendIndicator(uiState = uiState)
             }
         }
     }
 }
 
 @Composable
-private fun SectionLabel(title: String, modifier: Modifier = Modifier) {
+private fun SectionLabel(
+    title: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.secondary
+) {
     Text(
         text = title,
         style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.secondary,
+        color = color,
         modifier = modifier
     )
 }
 
 @Composable
-private fun TrendIndicator(uiState: HomeUiState, modifier: Modifier = Modifier) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
+private fun TrendIndicator(uiState: HomeUiState) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         val difference = uiState.mostRecentDifferenceFromPrevious
         Text(
             text = difference?.let { it.formatToOneDecimalPlace(showPlusSign = true) + " kg" }
                 ?: "-",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.outline
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
         )
         Box(
             contentAlignment = Alignment.Center
         ) {
-            val indicatorColor = MaterialTheme.colorScheme.onSurface
+            val indicatorColor = MaterialTheme.colorScheme.onPrimaryContainer
             val neutralColor =
-                MaterialTheme.colorScheme.surfaceVariant
+                MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f)
             Icon(
                 painter = painterResource(id = R.drawable.arrow_drop_up),
                 contentDescription = "Weight increasing",
