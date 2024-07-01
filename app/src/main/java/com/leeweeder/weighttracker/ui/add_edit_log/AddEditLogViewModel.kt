@@ -159,7 +159,16 @@ fun shouldUpdateStartingWeight(
     val goalWasAchieved = startingWeight.wasGoalAchieved
     val startingWeightDate = startingWeight.date?.let { epochMillisToLocalDate(it) }
     val goalWeightFloat = goalWeight.toFloat()
+    val isSurpassingGoal = if (startingWeight.weight != null) {
+        (goalWeightFloat - startingWeight.weight > 0 && currentWeight - goalWeightFloat > 0)
+                || (goalWeightFloat - startingWeight.weight < 0 && currentWeight - goalWeightFloat < 0)
+    } else {
+        false
+    }
+
     return isFirstTime
-            || goalWasAchieved == true && ((mostRecentLog != null && mostRecentLog.weight.value == goalWeightFloat) || currentWeight == goalWeightFloat)
+            || goalWasAchieved == true && ((mostRecentLog != null && mostRecentLog.weight.value == goalWeightFloat))
+            || (mostRecentLog == null && currentWeight == goalWeightFloat)
             || (currentDate <= startingWeightDate)
+            || isSurpassingGoal
 }
