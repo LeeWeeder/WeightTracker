@@ -6,7 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leeweeder.weighttracker.domain.usecases.DataStoreUseCases
 import com.leeweeder.weighttracker.domain.usecases.LogUseCases
-import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -23,7 +24,7 @@ class HomeViewModel @Inject constructor(
     private val _homeUiState = mutableStateOf(HomeUiState())
     val homeUiState: State<HomeUiState> = _homeUiState
 
-    val modelProducer = ChartEntryModelProducer()
+    val modelProducer = CartesianChartModelProducer.build()
 
     private var getFiveMostRecentLogsJob: Job? = null
 
@@ -36,6 +37,16 @@ class HomeViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun loadData() {
+        val data = homeUiState.value.fiveMostRecentLogs
+        if (data.isNotEmpty())
+            modelProducer.tryRunTransaction {
+                lineSeries {
+                    series(data.map { it.weight.value })
+                }
+            }
     }
 
     fun setGoalWeight(value: Int) {

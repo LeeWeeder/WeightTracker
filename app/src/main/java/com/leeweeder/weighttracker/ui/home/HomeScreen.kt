@@ -46,20 +46,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.weighttracker.R
-import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.MainActivityViewModel
 import com.leeweeder.weighttracker.ui.home.components.GoalScreenDialog
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.ui.util.formatToOneDecimalPlace
 import com.leeweeder.weighttracker.util.Screen
-import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
-import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
-import com.patrykandpatrick.vico.compose.chart.Chart
-import com.patrykandpatrick.vico.compose.chart.line.lineChart
-import com.patrykandpatrick.vico.compose.chart.line.lineSpec
-import com.patrykandpatrick.vico.core.chart.values.AxisValuesOverrider
-import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
+import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import kotlin.math.absoluteValue
 
 @Composable
@@ -82,7 +78,8 @@ fun HomeScreen(
             modelProducer = modelProducer,
             onNavigateToLogScreen = onNavigateToLogScreen,
             onNavigateToAddEditLogScreen = onNavigateToAddEditLogScreen,
-            onWeightGoalSet = onWeightGoalSet
+            onWeightGoalSet = onWeightGoalSet,
+            loadData = homeViewModel::loadData
         )
     }
 
@@ -109,10 +106,11 @@ fun HomeScreen(
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
-    modelProducer: ChartEntryModelProducer,
+    modelProducer: CartesianChartModelProducer,
     onNavigateToLogScreen: () -> Unit = {},
     onNavigateToAddEditLogScreen: () -> Unit = {},
-    onWeightGoalSet: (weight: Int) -> Unit
+    onWeightGoalSet: (weight: Int) -> Unit,
+    loadData: () -> Unit
 ) {
     val goalScreenDialogVisible = remember {
         mutableStateOf(false)
@@ -146,7 +144,8 @@ fun HomeScreen(
             ),
             showGoalScreen = {
                 goalScreenDialogVisible.value = true
-            }
+            },
+            loadData = loadData
         )
     }
 }
@@ -154,10 +153,11 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     uiState: HomeUiState,
-    modelProducer: ChartEntryModelProducer,
+    modelProducer: CartesianChartModelProducer,
     paddingValues: PaddingValues,
     onNavigateToLogScreen: () -> Unit,
-    showGoalScreen: () -> Unit
+    showGoalScreen: () -> Unit,
+    loadData: () -> Unit
 ) {
     LazyColumn(
         contentPadding = paddingValues,
@@ -226,7 +226,7 @@ fun HomeScreenContent(
             Spacer(modifier = Modifier.height(24.dp))
         }
         item {
-            LineChart(data = uiState.fiveMostRecentLogs, modelProducer = modelProducer)
+            LineChart(modelProducer = modelProducer, loadData = loadData)
         }
         item {
             RecentRecord(uiState = uiState, onNavigateToLogScreen = onNavigateToLogScreen)
@@ -349,7 +349,7 @@ fun WeightTrackerTopAppBar() {
 }
 
 @Composable
-fun LineChart(data: List<Log>, modelProducer: ChartEntryModelProducer) {
+fun LineChart(modelProducer: CartesianChartModelProducer, loadData: () -> Unit) {
     ElevatedCard(
         modifier = Modifier
             .padding(vertical = 16.dp),
@@ -359,18 +359,14 @@ fun LineChart(data: List<Log>, modelProducer: ChartEntryModelProducer) {
             SectionLabel(title = "Trend")
             Spacer(modifier = Modifier.height(8.dp))
 
-            val lineColor = MaterialTheme.colorScheme.primary
+            LaunchedEffect(Unit) {
+                loadData()
+            }
 
-            Chart(
-                chart = lineChart(
-                    remember {
-                        listOf(lineSpec(lineColor, lineBackgroundShader = null))
-                    },
-                    axisValuesOverrider = AxisValuesOverrider.adaptiveYValues(1f, true)
-                ),
-                chartModelProducer = modelProducer,
-                startAxis = rememberStartAxis(),
-                bottomAxis = rememberBottomAxis(),
+            CartesianChartHost(
+                chart = rememberCartesianChart(
+                    rememberLineCartesianLayer()
+                ), modelProducer = modelProducer,
                 placeholder = {
                     NoData()
                 }
