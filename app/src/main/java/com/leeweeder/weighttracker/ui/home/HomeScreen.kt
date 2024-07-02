@@ -60,7 +60,6 @@ import com.patrykandpatrick.vico.compose.chart.line.lineChart
 import com.patrykandpatrick.vico.compose.chart.line.lineSpec
 import com.patrykandpatrick.vico.core.chart.values.AxisValuesOverrider
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
-import com.patrykandpatrick.vico.core.entry.entryOf
 import kotlin.math.absoluteValue
 
 @Composable
@@ -318,19 +317,24 @@ private fun NoData() {
         Image(
             painter = painterResource(id = R.drawable.no_data),
             contentDescription = "No data available",
-            alpha = 0.5f,
-            modifier = Modifier.size(150.dp)
+            alpha = 0.3f,
+            modifier = Modifier.size(128.dp)
         )
-        Text(text = "No data available", color = MaterialTheme.colorScheme.outlineVariant)
-        Spacer(modifier = Modifier.height(4.dp))
-        Row {
-            Text(text = "Click ", color = MaterialTheme.colorScheme.outline)
+        val style = MaterialTheme.typography.bodyMedium
+        Text(
+            text = "No data available",
+            color = MaterialTheme.colorScheme.outlineVariant,
+            style = style
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "Click ", color = MaterialTheme.colorScheme.outline, style = style)
             Icon(
                 painter = painterResource(id = R.drawable.add_weight_record),
                 contentDescription = null,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(16.dp)
             )
-            Text(text = " to add one", color = MaterialTheme.colorScheme.outline)
+            Text(text = " to add one", color = MaterialTheme.colorScheme.outline, style = style)
         }
         Spacer(modifier = Modifier.height(40.dp))
     }
@@ -354,12 +358,6 @@ fun LineChart(data: List<Log>, modelProducer: ChartEntryModelProducer) {
         Column(modifier = Modifier.padding(16.dp)) {
             SectionLabel(title = "Trend")
             Spacer(modifier = Modifier.height(8.dp))
-
-            LaunchedEffect(data) {
-                val entries = List(data.size) { entryOf(it, data[it].weight.value) }
-                android.util.Log.d("Value", data.size.toString())
-                modelProducer.setEntries(entries)
-            }
 
             val lineColor = MaterialTheme.colorScheme.primary
 
