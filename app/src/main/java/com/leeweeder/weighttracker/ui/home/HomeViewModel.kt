@@ -38,6 +38,12 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun setGoalWeight(value: Int) {
+        viewModelScope.launch {
+            dataStoreUseCases.saveGoalWeight(value)
+        }
+    }
+
     private fun getFiveMostRecentLogs() {
         getFiveMostRecentLogsJob?.cancel()
         getFiveMostRecentLogsJob = logUseCases.getFiveMostRecentLogs()

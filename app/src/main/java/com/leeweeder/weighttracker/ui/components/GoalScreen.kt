@@ -37,13 +37,14 @@ import com.leeweeder.weighttracker.R
 
 @Composable
 fun GoalScreen(
+    initialValue: Int = 60,
     onWeightGoalSet: (weight: Int) -> Unit
 ) {
     val isValidationDialogVisible = remember {
         mutableStateOf(false)
     }
     val goalWeightState = remember {
-        mutableStateOf("60")
+        mutableStateOf(initialValue.toString())
     }
     if (isValidationDialogVisible.value) {
         AlertDialog(
