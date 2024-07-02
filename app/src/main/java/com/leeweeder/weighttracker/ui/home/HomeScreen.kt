@@ -49,6 +49,7 @@ import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.MainActivityViewModel
+import com.leeweeder.weighttracker.ui.home.components.GoalScreenDialog
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.ui.util.formatToOneDecimalPlace
 import com.leeweeder.weighttracker.util.Screen
@@ -74,13 +75,15 @@ fun HomeScreen(
     val modelProducer = homeViewModel.modelProducer
     val onNavigateToLogScreen = { navController.navigate(Screen.LogScreen.route) }
     val onNavigateToAddEditLogScreen = { navController.navigate(Screen.AddEditLogScreen.route) }
+    val onWeightGoalSet = homeViewModel::setGoalWeight
 
     val homeScreen = @Composable {
         HomeScreen(
             uiState = uiState,
             modelProducer = modelProducer,
             onNavigateToLogScreen = onNavigateToLogScreen,
-            onNavigateToAddEditLogScreen = onNavigateToAddEditLogScreen
+            onNavigateToAddEditLogScreen = onNavigateToAddEditLogScreen,
+            onWeightGoalSet = onWeightGoalSet
         )
     }
 
@@ -109,8 +112,21 @@ fun HomeScreen(
     uiState: HomeUiState,
     modelProducer: ChartEntryModelProducer,
     onNavigateToLogScreen: () -> Unit = {},
-    onNavigateToAddEditLogScreen: () -> Unit = {}
+    onNavigateToAddEditLogScreen: () -> Unit = {},
+    onWeightGoalSet: (weight: Int) -> Unit
 ) {
+    val goalScreenDialogVisible = remember {
+        mutableStateOf(false)
+    }
+    GoalScreenDialog(
+        visible = goalScreenDialogVisible.value,
+        initialValue = uiState.goalWeight,
+        onDismissRequest = {
+            goalScreenDialogVisible.value = false
+        }) { weight ->
+        onWeightGoalSet(weight)
+    }
+
     val fabHeight = remember {
         mutableStateOf(0.dp)
     }
@@ -128,7 +144,10 @@ fun HomeScreen(
             paddingValues = PaddingValues(
                 top = it.calculateTopPadding(),
                 bottom = it.calculateBottomPadding() + fabHeight.value + 32.dp
-            )
+            ),
+            showGoalScreen = {
+                goalScreenDialogVisible.value = true
+            }
         )
     }
 }
@@ -138,7 +157,8 @@ fun HomeScreenContent(
     uiState: HomeUiState,
     modelProducer: ChartEntryModelProducer,
     paddingValues: PaddingValues,
-    onNavigateToLogScreen: () -> Unit
+    onNavigateToLogScreen: () -> Unit,
+    showGoalScreen: () -> Unit
 ) {
     LazyColumn(
         contentPadding = paddingValues,
@@ -158,7 +178,8 @@ fun HomeScreenContent(
                 )
                 Card(
                     shape = MaterialTheme.shapes.extraLarge,
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+                    onClick = showGoalScreen
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         SectionLabel(
