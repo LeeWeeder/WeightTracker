@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leeweeder.weighttracker.domain.usecases.DataStoreUseCases
 import com.leeweeder.weighttracker.domain.usecases.LogUseCases
-import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -22,8 +21,6 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     private val _homeUiState = mutableStateOf(HomeUiState())
     val homeUiState: State<HomeUiState> = _homeUiState
-
-    val modelProducer = ChartEntryModelProducer()
 
     private var getFiveMostRecentLogsJob: Job? = null
 
