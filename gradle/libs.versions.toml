@@ -17,7 +17,7 @@ hilt = "2.51.1"
 junit = "4.13.2"
 kotlin = "1.9.24"
 ksp = "1.9.24-1.0.20"
-vico = "1.14.0"
+vico = "2.0.0-alpha.21"
 datastore = "1.1.1"
 splashscreen = "1.0.1"
 
@@ -52,9 +52,7 @@ hilt-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", 
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
-vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
-vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
-vico-core = { group = "com.patrykandpatrick.vico", name = "core", version.ref = "vico" }
+vico = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 
 [plugins]

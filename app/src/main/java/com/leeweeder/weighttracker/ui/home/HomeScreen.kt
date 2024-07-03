@@ -71,7 +71,6 @@ fun HomeScreen(
 ) {
     val navController = LocalNavController.current
     val uiState = homeViewModel.homeUiState.value
-    val modelProducer = homeViewModel.modelProducer
     val onNavigateToLogScreen = { navController.navigate(Screen.LogScreen.route) }
     val onNavigateToAddEditLogScreen = { navController.navigate(Screen.AddEditLogScreen.route) }
     val onWeightGoalSet = homeViewModel::setGoalWeight
@@ -79,7 +78,6 @@ fun HomeScreen(
     val homeScreen = @Composable {
         HomeScreen(
             uiState = uiState,
-            modelProducer = modelProducer,
             onNavigateToLogScreen = onNavigateToLogScreen,
             onNavigateToAddEditLogScreen = onNavigateToAddEditLogScreen,
             onWeightGoalSet = onWeightGoalSet
@@ -109,7 +107,6 @@ fun HomeScreen(
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
-    modelProducer: ChartEntryModelProducer,
     onNavigateToLogScreen: () -> Unit = {},
     onNavigateToAddEditLogScreen: () -> Unit = {},
     onWeightGoalSet: (weight: Int) -> Unit
@@ -138,7 +135,6 @@ fun HomeScreen(
     ) {
         HomeScreenContent(
             uiState = uiState,
-            modelProducer = modelProducer,
             onNavigateToLogScreen = onNavigateToLogScreen,
             paddingValues = PaddingValues(
                 top = it.calculateTopPadding(),
@@ -154,7 +150,6 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     uiState: HomeUiState,
-    modelProducer: ChartEntryModelProducer,
     paddingValues: PaddingValues,
     onNavigateToLogScreen: () -> Unit,
     showGoalScreen: () -> Unit
@@ -226,7 +221,7 @@ fun HomeScreenContent(
             Spacer(modifier = Modifier.height(24.dp))
         }
         item {
-            LineChart(data = uiState.fiveMostRecentLogs, modelProducer = modelProducer)
+            LineChart(uiState = uiState)
         }
         item {
             RecentRecord(uiState = uiState, onNavigateToLogScreen = onNavigateToLogScreen)
@@ -349,7 +344,7 @@ fun WeightTrackerTopAppBar() {
 }
 
 @Composable
-fun LineChart(data: List<Log>, modelProducer: ChartEntryModelProducer) {
+fun LineChart(uiState: HomeUiState) {
     ElevatedCard(
         modifier = Modifier
             .padding(vertical = 16.dp),
@@ -359,7 +354,9 @@ fun LineChart(data: List<Log>, modelProducer: ChartEntryModelProducer) {
             SectionLabel(title = "Trend")
             Spacer(modifier = Modifier.height(8.dp))
 
-            val lineColor = MaterialTheme.colorScheme.primary
+            val modelProducer = remember { CartesianChartModelProducer.build() }
+
+            val data = uiState.fiveMostRecentLogs.reversed()
 
             Chart(
                 chart = lineChart(
@@ -373,6 +370,31 @@ fun LineChart(data: List<Log>, modelProducer: ChartEntryModelProducer) {
                 bottomAxis = rememberBottomAxis(),
                 placeholder = {
                     NoData()
+            LaunchedEffect(data) {
+                if (data.isNotEmpty()) {
+                    withContext(Dispatchers.Default) {
+                        modelProducer.tryRunTransaction {
+                            lineSeries {
+                                series(
+                                    x = data.map { it.date.dayOfWeek.value },
+                                    y = data.map { it.weight.value }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            CartesianChartHost(
+                chart = rememberCartesianChart(
+                    rememberLineCartesianLayer(
+                        lines = listOf(
+                            rememberLineSpec(
+                            )
+                        ),
+                    ),
+                ), modelProducer = modelProducer,
+                horizontalLayout = HorizontalLayout.FullWidth(),
                 }
             )
         }
