@@ -34,7 +34,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -230,7 +229,9 @@ fun HomeScreenContent(
                     modelProducer = modelProducer,
                     observeFiveMostRecentLogsAndGoalWeight = observeFiveMostRecentLogsAndGoalWeight,
                     mostRecentLogDayOfTheWeek = uiState.mostRecentLog?.date?.dayOfWeek?.value?.toFloat(),
-                    modifier = Modifier.padding(bottom = 16.dp).padding(horizontal = 12.dp)
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .padding(horizontal = 12.dp)
                 )
             }
         }
@@ -243,44 +244,38 @@ fun HomeScreenContent(
 @Composable
 private fun RecentRecord(uiState: HomeUiState, onNavigateToLogScreen: () -> Unit) {
     HomeScreenCard(title = "Recent records", onSeeMoreClick = onNavigateToLogScreen) {
-        Column(
-            modifier = Modifier.padding(horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp)
-        ) {
-            if (uiState.fiveMostRecentLogs.isEmpty()) {
-                NoData()
-            } else {
-                uiState.fiveMostRecentLogs.forEach { log ->
-                    ListItem(
-                        headlineContent = {
+        if (uiState.fiveMostRecentLogs.isEmpty()) {
+            NoData()
+        } else {
+            uiState.fiveMostRecentLogs.forEach { log ->
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = log.date.format("EEE, MMM d, yyyy", true),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    trailingContent = {
+                        Row(verticalAlignment = Alignment.Bottom) {
                             Text(
-                                text = log.date.format("EEE, MMM d, yyyy", true),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                text = log.weight.displayValue,
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
-                        },
-                        trailingContent = {
-                            Row(verticalAlignment = Alignment.Bottom) {
-                                Text(
-                                    text = log.weight.displayValue,
-                                    style = MaterialTheme.typography.titleLarge.copy(
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                )
-                                Text(
-                                    text = " kg",
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            }
-                        },
-                        modifier = Modifier
-                            .clip(shape = MaterialTheme.shapes.large)
-                            .clickable { /*TODO*/ }
-                    )
-                }
+                            Text(
+                                text = " kg",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .clickable { /*TODO*/ }
+                )
             }
+            Spacer(modifier = Modifier.height(8.dp))
         }
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
