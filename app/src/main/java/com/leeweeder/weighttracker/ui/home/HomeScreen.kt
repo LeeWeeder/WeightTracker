@@ -372,7 +372,7 @@ fun CurrentWeight(uiState: HomeUiState) {
         ) {
             Box(
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(0.8f)
                     .padding(bottom = 6.dp),
                 contentAlignment = Alignment.BottomCenter
             ) {
@@ -394,8 +394,7 @@ fun CurrentWeight(uiState: HomeUiState) {
             )
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .offset(y = (-8).dp),
+                    .weight(0.9f),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
