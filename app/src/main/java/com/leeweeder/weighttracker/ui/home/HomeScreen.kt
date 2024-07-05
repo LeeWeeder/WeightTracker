@@ -29,7 +29,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +50,7 @@ import com.leeweeder.weighttracker.ui.MainActivityViewModel
 import com.leeweeder.weighttracker.ui.home.components.GoalScreenDialog
 import com.leeweeder.weighttracker.ui.home.components.LineChart
 import com.leeweeder.weighttracker.ui.home.components.SectionLabel
+import com.leeweeder.weighttracker.ui.home.components.SeeMoreButton
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.ui.util.formatToOneDecimalPlace
 import com.leeweeder.weighttracker.util.Screen
@@ -244,13 +244,13 @@ private fun RecentRecord(uiState: HomeUiState, onNavigateToLogScreen: () -> Unit
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 8.dp),
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             SectionLabel(title = "Recent records")
-            TextButton(onClick = onNavigateToLogScreen) {
-                Text(text = "See all")
+            SeeMoreButton {
+                onNavigateToLogScreen()
             }
         }
         Column(
