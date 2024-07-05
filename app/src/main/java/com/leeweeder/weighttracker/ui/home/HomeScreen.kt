@@ -186,7 +186,7 @@ fun HomeScreenContent(
                         )
                         Text(
                             text = uiState.goalWeight.toString(),
-                            style = MaterialTheme.typography.headlineSmall
+                            style = MaterialTheme.typography.titleLarge
                         )
                     }
                 }
