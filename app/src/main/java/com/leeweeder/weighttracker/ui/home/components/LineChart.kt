@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
+import com.leeweeder.weighttracker.ui.home.NoData
 import com.leeweeder.weighttracker.ui.home.daysOfWeeksWithValuesKey
 import com.leeweeder.weighttracker.ui.home.goalWeightKey
 import com.leeweeder.weighttracker.ui.home.mostRecentLogDayOfTheWeekKey
@@ -174,7 +175,10 @@ fun LineChart(
             scalableEndPaddingDp = 15f
         ),
         modifier = modifier,
-        zoomState = rememberVicoZoomState(zoomEnabled = false)
+        zoomState = rememberVicoZoomState(zoomEnabled = false),
+        placeholder = {
+            NoData()
+        }
     )
 }
 
