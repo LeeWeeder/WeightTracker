@@ -302,7 +302,8 @@ private fun AddWeightRecordFab(onClick: () -> Unit, onHeightSet: (Dp) -> Unit = 
             onHeightSet(with(density) {
                 it.size.height.toDp()
             })
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.primary
     ) {
         Icon(
             painter = painterResource(id = R.drawable.add_weight_record),
