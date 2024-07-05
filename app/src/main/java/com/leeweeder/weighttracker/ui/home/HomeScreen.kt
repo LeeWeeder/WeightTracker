@@ -366,7 +366,7 @@ fun CurrentWeight(uiState: HomeUiState) {
                     color = MaterialTheme.colorScheme.primaryContainer,
                     shape = CircleShape
                 )
-                .size(170.dp)
+                .size(200.dp)
         ) {
             Box(
                 modifier = Modifier
