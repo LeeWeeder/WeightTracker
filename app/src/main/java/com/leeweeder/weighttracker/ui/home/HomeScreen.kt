@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -48,9 +47,8 @@ import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.MainActivityViewModel
 import com.leeweeder.weighttracker.ui.home.components.GoalScreenDialog
+import com.leeweeder.weighttracker.ui.home.components.HomeScreenCard
 import com.leeweeder.weighttracker.ui.home.components.LineChart
-import com.leeweeder.weighttracker.ui.home.components.SectionLabel
-import com.leeweeder.weighttracker.ui.home.components.SeeMoreButton
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.ui.util.formatToOneDecimalPlace
 import com.leeweeder.weighttracker.util.Screen
@@ -163,7 +161,8 @@ fun HomeScreenContent(
         contentPadding = paddingValues,
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .consumeWindowInsets(paddingValues)
+            .consumeWindowInsets(paddingValues),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item { WeightTrackerTopAppBar() }
         item {
@@ -181,9 +180,10 @@ fun HomeScreenContent(
                     onClick = showGoalScreen
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        SectionLabel(
-                            title = "Goal",
-                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        Text(
+                            text = "Goal",
+                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            style = MaterialTheme.typography.labelSmall
                         )
                         Text(
                             text = uiState.goalWeight.toString(),
@@ -192,8 +192,7 @@ fun HomeScreenContent(
                     }
                 }
             }
-        }
-        item {
+
             val differenceFromGoal = uiState.mostRecentDifferenceFromGoal
             Spacer(modifier = Modifier.height(16.dp))
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -223,14 +222,17 @@ fun HomeScreenContent(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
         item {
-            LineChart(
-                modelProducer = modelProducer,
-                observeFiveMostRecentLogsAndGoalWeight = observeFiveMostRecentLogsAndGoalWeight,
-                mostRecentLogDayOfTheWeek = uiState.mostRecentLog?.date?.dayOfWeek?.value?.toFloat()
-            )
+            HomeScreenCard(title = "Week trend", onSeeMoreClick = { /*TODO*/ }) {
+                LineChart(
+                    modelProducer = modelProducer,
+                    observeFiveMostRecentLogsAndGoalWeight = observeFiveMostRecentLogsAndGoalWeight,
+                    mostRecentLogDayOfTheWeek = uiState.mostRecentLog?.date?.dayOfWeek?.value?.toFloat(),
+                    modifier = Modifier.padding(bottom = 16.dp).padding(horizontal = 12.dp)
+                )
+            }
         }
         item {
             RecentRecord(uiState = uiState, onNavigateToLogScreen = onNavigateToLogScreen)
@@ -240,19 +242,7 @@ fun HomeScreenContent(
 
 @Composable
 private fun RecentRecord(uiState: HomeUiState, onNavigateToLogScreen: () -> Unit) {
-    ElevatedCard {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            SectionLabel(title = "Recent records")
-            SeeMoreButton {
-                onNavigateToLogScreen()
-            }
-        }
+    HomeScreenCard(title = "Recent records", onSeeMoreClick = onNavigateToLogScreen) {
         Column(
             modifier = Modifier.padding(horizontal = 8.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp)
