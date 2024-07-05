@@ -37,7 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -46,20 +45,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.weighttracker.R
-import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.MainActivityViewModel
 import com.leeweeder.weighttracker.ui.home.components.GoalScreenDialog
+import com.leeweeder.weighttracker.ui.home.components.LineChart
+import com.leeweeder.weighttracker.ui.home.components.SectionLabel
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.ui.util.formatToOneDecimalPlace
 import com.leeweeder.weighttracker.util.Screen
-import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
-import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
-import com.patrykandpatrick.vico.compose.chart.Chart
-import com.patrykandpatrick.vico.compose.chart.line.lineChart
-import com.patrykandpatrick.vico.compose.chart.line.lineSpec
-import com.patrykandpatrick.vico.core.chart.values.AxisValuesOverrider
-import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import kotlin.math.absoluteValue
 
 @Composable
@@ -74,13 +68,17 @@ fun HomeScreen(
     val onNavigateToLogScreen = { navController.navigate(Screen.LogScreen.route) }
     val onNavigateToAddEditLogScreen = { navController.navigate(Screen.AddEditLogScreen.route) }
     val onWeightGoalSet = homeViewModel::setGoalWeight
+    val observeFiveMostRecentLogsAndGoalWeight = homeViewModel::observeMostRecentLogsAndGoalWeight
+    val modelProducer = homeViewModel.modelProducer
 
     val homeScreen = @Composable {
         HomeScreen(
             uiState = uiState,
             onNavigateToLogScreen = onNavigateToLogScreen,
             onNavigateToAddEditLogScreen = onNavigateToAddEditLogScreen,
-            onWeightGoalSet = onWeightGoalSet
+            onWeightGoalSet = onWeightGoalSet,
+            observeFiveMostRecentLogsAndGoalWeight = observeFiveMostRecentLogsAndGoalWeight,
+            modelProducer = modelProducer
         )
     }
 
@@ -109,7 +107,9 @@ fun HomeScreen(
     uiState: HomeUiState,
     onNavigateToLogScreen: () -> Unit = {},
     onNavigateToAddEditLogScreen: () -> Unit = {},
-    onWeightGoalSet: (weight: Int) -> Unit
+    onWeightGoalSet: (weight: Int) -> Unit,
+    observeFiveMostRecentLogsAndGoalWeight: () -> Unit,
+    modelProducer: CartesianChartModelProducer
 ) {
     val goalScreenDialogVisible = remember {
         mutableStateOf(false)
@@ -142,7 +142,9 @@ fun HomeScreen(
             ),
             showGoalScreen = {
                 goalScreenDialogVisible.value = true
-            }
+            },
+            observeFiveMostRecentLogsAndGoalWeight = observeFiveMostRecentLogsAndGoalWeight,
+            modelProducer = modelProducer
         )
     }
 }
@@ -152,7 +154,9 @@ fun HomeScreenContent(
     uiState: HomeUiState,
     paddingValues: PaddingValues,
     onNavigateToLogScreen: () -> Unit,
-    showGoalScreen: () -> Unit
+    showGoalScreen: () -> Unit,
+    observeFiveMostRecentLogsAndGoalWeight: () -> Unit,
+    modelProducer: CartesianChartModelProducer
 ) {
     LazyColumn(
         contentPadding = paddingValues,
@@ -221,7 +225,11 @@ fun HomeScreenContent(
             Spacer(modifier = Modifier.height(24.dp))
         }
         item {
-            LineChart(uiState = uiState)
+            LineChart(
+                modelProducer = modelProducer,
+                observeFiveMostRecentLogsAndGoalWeight = observeFiveMostRecentLogsAndGoalWeight,
+                mostRecentLogDayOfTheWeek = uiState.mostRecentLog?.date?.dayOfWeek?.value?.toFloat()
+            )
         }
         item {
             RecentRecord(uiState = uiState, onNavigateToLogScreen = onNavigateToLogScreen)
@@ -344,64 +352,6 @@ fun WeightTrackerTopAppBar() {
 }
 
 @Composable
-fun LineChart(uiState: HomeUiState) {
-    ElevatedCard(
-        modifier = Modifier
-            .padding(vertical = 16.dp),
-        onClick = {}
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            SectionLabel(title = "Trend")
-            Spacer(modifier = Modifier.height(8.dp))
-
-            val modelProducer = remember { CartesianChartModelProducer.build() }
-
-            val data = uiState.fiveMostRecentLogs.reversed()
-
-            Chart(
-                chart = lineChart(
-                    remember {
-                        listOf(lineSpec(lineColor, lineBackgroundShader = null))
-                    },
-                    axisValuesOverrider = AxisValuesOverrider.adaptiveYValues(1f, true)
-                ),
-                chartModelProducer = modelProducer,
-                startAxis = rememberStartAxis(),
-                bottomAxis = rememberBottomAxis(),
-                placeholder = {
-                    NoData()
-            LaunchedEffect(data) {
-                if (data.isNotEmpty()) {
-                    withContext(Dispatchers.Default) {
-                        modelProducer.tryRunTransaction {
-                            lineSeries {
-                                series(
-                                    x = data.map { it.date.dayOfWeek.value },
-                                    y = data.map { it.weight.value }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            CartesianChartHost(
-                chart = rememberCartesianChart(
-                    rememberLineCartesianLayer(
-                        lines = listOf(
-                            rememberLineSpec(
-                            )
-                        ),
-                    ),
-                ), modelProducer = modelProducer,
-                horizontalLayout = HorizontalLayout.FullWidth(),
-                }
-            )
-        }
-    }
-}
-
-@Composable
 fun CurrentWeight(uiState: HomeUiState) {
     val mostRecentLog = uiState.mostRecentLog
     Column(
@@ -452,19 +402,7 @@ fun CurrentWeight(uiState: HomeUiState) {
     }
 }
 
-@Composable
-private fun SectionLabel(
-    title: String,
-    modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.secondary
-) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.labelLarge,
-        color = color,
-        modifier = modifier
-    )
-}
+
 
 @Composable
 private fun TrendIndicator(uiState: HomeUiState) {
