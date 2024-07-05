@@ -299,7 +299,7 @@ private fun AddWeightRecordFab(onClick: () -> Unit, onHeightSet: (Dp) -> Unit = 
 }
 
 @Composable
-private fun NoData() {
+fun NoData() {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
