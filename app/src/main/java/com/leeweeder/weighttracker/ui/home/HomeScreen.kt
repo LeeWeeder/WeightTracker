@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -129,7 +130,8 @@ fun HomeScreen(
             AddWeightRecordFab(onClick = onNavigateToAddEditLogScreen, onHeightSet = {
                 fabHeight.value = it
             })
-        }
+        },
+        topBar = { WeightTrackerTopAppBar() }
     ) {
         HomeScreenContent(
             uiState = uiState,
@@ -160,10 +162,10 @@ fun HomeScreenContent(
         contentPadding = paddingValues,
         modifier = Modifier
             .padding(horizontal = 16.dp)
+            .safeContentPadding()
             .consumeWindowInsets(paddingValues),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        item { WeightTrackerTopAppBar() }
         item {
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -342,8 +344,7 @@ fun WeightTrackerTopAppBar() {
 fun CurrentWeight(uiState: HomeUiState) {
     val mostRecentLog = uiState.mostRecentLog
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-            .padding(top = 32.dp)
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
