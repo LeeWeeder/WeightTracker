@@ -43,6 +43,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.LocalNavController
@@ -371,7 +372,7 @@ fun CurrentWeight(uiState: HomeUiState) {
         ) {
             Box(
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(0.8f)
                     .padding(bottom = 6.dp),
                 contentAlignment = Alignment.BottomCenter
             ) {
@@ -381,16 +382,19 @@ fun CurrentWeight(uiState: HomeUiState) {
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
+            val displayLarge = MaterialTheme.typography.displayLarge
             Text(
                 text = mostRecentLog?.weight?.displayValue ?: "-",
-                style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.SemiBold),
+                style = displayLarge.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = (displayLarge.fontSize.value + 24).sp
+                ),
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.weight(1f)
             )
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .offset(y = (-8).dp),
+                    .weight(0.9f),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
@@ -402,7 +406,6 @@ fun CurrentWeight(uiState: HomeUiState) {
         }
     }
 }
-
 
 
 @Composable
