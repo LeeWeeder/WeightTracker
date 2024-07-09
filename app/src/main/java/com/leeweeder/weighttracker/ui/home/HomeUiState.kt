@@ -3,14 +3,17 @@ package com.leeweeder.weighttracker.ui.home
 import com.leeweeder.weighttracker.domain.model.Log
 
 data class HomeUiState(
-    val fiveMostRecentLogs: List<Log> = emptyList(),
+    val logsForThisWeek: List<Log> = emptyList(),
     val goalWeight: Int = 0
 ) {
     val mostRecentLog: Log?
-        get() = fiveMostRecentLogs.firstOrNull()
+        get() = logsForThisWeek.lastOrNull()
 
     private val previousMostRecentLog: Log?
-        get() = if (fiveMostRecentLogs.size > 1) fiveMostRecentLogs[1] else null
+        get() {
+            val logsForThisWeekSize = logsForThisWeek.size
+            return if (logsForThisWeekSize > 1) logsForThisWeek[logsForThisWeekSize - 2] else null
+        }
 
     val mostRecentDifferenceFromPrevious: Float?
         get() = previousMostRecentLog?.weight?.value?.let {
