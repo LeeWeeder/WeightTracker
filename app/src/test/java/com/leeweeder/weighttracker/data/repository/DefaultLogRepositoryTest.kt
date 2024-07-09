@@ -2,7 +2,6 @@ package com.leeweeder.weighttracker.data.repository
 
 import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.domain.repository.LogRepository
-import com.leeweeder.weighttracker.util.Weight
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -14,11 +13,7 @@ class FakeLogRepository @Inject constructor() : LogRepository {
         return flow { emit(logs) }
     }
 
-    override fun getFiveMostRecentLogs(): Flow<List<Log>> {
-        return flow { emit(logs.take(5))}
-    }
-
-    override fun getOldestLogWeight(): Flow<Weight?> {
+    override fun getLogsAroundDate(epochDay: Long, padding: Int): Flow<List<Log>> {
         TODO("Not yet implemented")
     }
 
@@ -26,7 +21,7 @@ class FakeLogRepository @Inject constructor() : LogRepository {
         return logs.find { it.id == id }!!
     }
 
-    override suspend fun getLogByDate(millis: Long): Log {
+    override suspend fun getLogByDate(epochDay: Long): Log {
         TODO("Not yet implemented")
     }
 

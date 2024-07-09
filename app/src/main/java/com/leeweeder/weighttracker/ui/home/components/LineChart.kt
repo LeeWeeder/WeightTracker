@@ -2,9 +2,11 @@ package com.leeweeder.weighttracker.ui.home.components
 
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.text.Layout
 import android.text.SpannableStringBuilder
 import android.text.style.ReplacementSpan
+import android.text.style.StyleSpan
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +20,8 @@ import com.leeweeder.weighttracker.ui.home.daysOfWeeksWithValuesKey
 import com.leeweeder.weighttracker.ui.home.goalWeightKey
 import com.leeweeder.weighttracker.ui.home.mostRecentLogDayOfTheWeekKey
 import com.leeweeder.weighttracker.ui.home.util.weightTrackerValueOverrider
+import com.leeweeder.weighttracker.ui.home.xToDateMapKey
+import com.leeweeder.weighttracker.ui.util.format
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLineComponent
@@ -50,7 +54,6 @@ import java.time.LocalDate
 
 @Composable
 fun LineChart(
-    mostRecentLogDayOfTheWeek: Float?,
     modelProducer: CartesianChartModelProducer,
     observeFiveMostRecentLogsAndGoalWeight: () -> Unit,
     modifier: Modifier = Modifier
@@ -79,7 +82,7 @@ fun LineChart(
                             shape = Shape.Pill,
                             color = primaryColor
                         ),
-                        pointSize = 3.5.dp
+                        pointSize = 3.dp
                     )
                 ),
                 axisValueOverrider = remember {
@@ -115,7 +118,6 @@ fun LineChart(
                     AxisItemPlacer.Horizontal.default(addExtremeLabelPadding = true)
                 },
                 valueFormatter = remember {
-                    val days = listOf("S", "M", "T", "W", "T", "F", "S")
                     CartesianValueFormatter { x, chartValues, _ ->
                         val extraStore = chartValues.model.extraStore
                         val (backgroundColor, textColor, borderColor) = if (x == extraStore[mostRecentLogDayOfTheWeekKey])
@@ -143,7 +145,9 @@ fun LineChart(
                                 secondaryContainerColor
                             )
                         setSpan(
-                            days[x.toInt() % days.size],
+                            (chartValues.model.extraStore[xToDateMapKey][x] ?: LocalDate.ofEpochDay(
+                                x.toLong()
+                            )).format("E").first().toString(),
                             backgroundColor,
                             textColor,
                             borderColor
@@ -155,19 +159,18 @@ fun LineChart(
                 rememberHorizontalLine(
                     y = { it[goalWeightKey] },
                     line = rememberLineComponent(
-                        color = MaterialTheme.colorScheme.primary.copy(0.6f),
-                        shape = Shape.dashed(shape = Shape.Rectangle, 5.dp, 2.5.dp),
+                        color = MaterialTheme.colorScheme.secondary.copy(0.6f),
+                        shape = Shape.dashed(shape = Shape.Pill, 5.dp, 4.dp),
                         margins = Dimensions.of(start = 20.dp),
-                        thickness = 0.8.dp
+                        thickness = 1.5.dp
                     ),
                     labelComponent = rememberTextComponent(
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.secondary
                     ),
                     horizontalLabelPosition = HorizontalPosition.Start,
                     verticalLabelPosition = VerticalPosition.Center
                 )
-            ),
-            persistentMarkers = mostRecentLogDayOfTheWeek?.let { mapOf(it to marker) }
+            )
         ), modelProducer = modelProducer,
         marker = marker,
         horizontalLayout = HorizontalLayout.FullWidth(
@@ -240,11 +243,14 @@ fun setSpan(
     borderColor: Color? = null
 ): SpannableStringBuilder {
     val spannable = SpannableStringBuilder(text)
+    val start = 0
+    val end = text.length
     spannable.setSpan(
         CircleBackgroundSpan(backgroundColor, textColor, borderColor),
-        0,
-        text.length,
+        start,
+        end,
         SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE
     )
+    spannable.setSpan(StyleSpan(Typeface.BOLD), start, end, 0)
     return spannable
 }

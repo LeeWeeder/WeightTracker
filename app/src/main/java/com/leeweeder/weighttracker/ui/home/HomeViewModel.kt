@@ -16,11 +16,14 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 val goalWeightKey = ExtraStore.Key<Float>()
 val daysOfWeeksWithValuesKey = ExtraStore.Key<Set<Float>>()
 val mostRecentLogDayOfTheWeekKey = ExtraStore.Key<Float>()
+val xToDateMapKey = ExtraStore.Key<Map<Float, LocalDate>>()
+val daysOfTheWeek = ExtraStore.Key<List<LocalDate>>()
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -30,14 +33,18 @@ class HomeViewModel @Inject constructor(
     private val _homeUiState = mutableStateOf(HomeUiState())
     val homeUiState: State<HomeUiState> = _homeUiState
 
-    private var getFiveMostRecentLogsJob: Job? = null
+    private var getLogsForWeekJob: Job? = null
 
     private val _modelProducer = CartesianChartModelProducer()
     val modelProducer
         get() = _modelProducer
 
+    private val today = LocalDate.now()
+    private val _daysOfWeek = mutableStateOf(logUseCases.getLogsForWeek.getDaysOfWeek(today))
+    val daysOfWeek: State<List<LocalDate>> = _daysOfWeek
+
     init {
-        getFiveMostRecentLogs()
+        getLogsForWeek()
         viewModelScope.launch {
             dataStoreUseCases.readGoalWeightState().collectLatest { goalWeight ->
                 _homeUiState.value = homeUiState.value.copy(
@@ -50,7 +57,7 @@ class HomeViewModel @Inject constructor(
     fun observeMostRecentLogsAndGoalWeight() {
         viewModelScope.launch {
             snapshotFlow {
-                homeUiState.value.fiveMostRecentLogs
+                homeUiState.value.logsForThisWeek
             }
                 .onEach { loadLineChart() }
                 .launchIn(viewModelScope)
@@ -62,27 +69,35 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun loadLineChart() {
-        val data = homeUiState.value.fiveMostRecentLogs.reversed()
-        if (data.isEmpty()) return
+        val originalData =
+            homeUiState.value.logsForThisWeek.also { if (it.isEmpty()) return }.reversed()
+
+        val data = originalData.associate {
+            it.date to it.weight.value
+        }
+
+        val xToDates = data.keys.associateBy { it.toEpochDay().toFloat() }
 
         viewModelScope.launch {
             modelProducer.runTransaction {
                 lineSeries {
                     series(
-                        x = data.map { it.date.dayOfWeek.value },
-                        y = data.map { it.weight.value }
+                        x = xToDates.keys,
+                        y = data.values
                     )
                 }
                 extras { extraStore ->
                     extraStore[goalWeightKey] = homeUiState.value.goalWeight.toFloat()
                     extraStore[daysOfWeeksWithValuesKey] =
-                        data.map {
-                            it.date.dayOfWeek.value.toFloat()
+                        originalData.map {
+                            it.date.toEpochDay().toFloat()
                         }.toSet()
                     val mostRecentLog = homeUiState.value.mostRecentLog
                     if (mostRecentLog != null)
                         extraStore[mostRecentLogDayOfTheWeekKey] =
-                            mostRecentLog.date.dayOfWeek.value.toFloat()
+                            mostRecentLog.date.toEpochDay().toFloat()
+                    extraStore[xToDateMapKey] = xToDates
+                    extraStore[daysOfTheWeek] = daysOfWeek.value
                 }
             }
         }
@@ -94,12 +109,12 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun getFiveMostRecentLogs() {
-        getFiveMostRecentLogsJob?.cancel()
-        getFiveMostRecentLogsJob = logUseCases.getFiveMostRecentLogs()
+    private fun getLogsForWeek() {
+        getLogsForWeekJob?.cancel()
+        getLogsForWeekJob = logUseCases.getLogsForWeek(today)
             .onEach { logs ->
                 _homeUiState.value = homeUiState.value.copy(
-                    fiveMostRecentLogs = logs
+                    logsForThisWeek = logs
                 )
             }
             .launchIn(viewModelScope)

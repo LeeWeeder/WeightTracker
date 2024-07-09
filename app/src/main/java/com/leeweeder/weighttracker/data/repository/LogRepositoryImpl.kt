@@ -12,16 +12,16 @@ class LogRepositoryImpl(
         return dao.getLogs()
     }
 
-    override fun getFiveMostRecentLogs(): Flow<List<Log>> {
-        return dao.getFiveMostRecentLogs()
+    override fun getLogsAroundDate(epochDay: Long, padding: Int): Flow<List<Log>> {
+        return dao.getLogsAroundDate(epochDay, padding)
     }
 
     override suspend fun getLogById(id: Int): Log {
         return dao.getLogById(id)
     }
 
-    override suspend fun getLogByDate(millis: Long): Log {
-        return dao.getLogByDate(millis)
+    override suspend fun getLogByDate(epochDay: Long): Log {
+        return dao.getLogByDate(epochDay)
     }
 
     override suspend fun insertLog(log: Log): Long {

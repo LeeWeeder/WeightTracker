@@ -22,11 +22,11 @@ import kotlinx.coroutines.flow.Flow
 interface LogRepository {
     fun getLogs(): Flow<List<Log>>
 
-    fun getFiveMostRecentLogs(): Flow<List<Log>>
+    fun getLogsAroundDate(epochDay: Long, padding: Int): Flow<List<Log>>
 
     suspend fun getLogById(id: Int): Log
 
-    suspend fun getLogByDate(millis: Long): Log
+    suspend fun getLogByDate(epochDay: Long): Log
 
     suspend fun insertLog(log: Log): Long
 

@@ -1,12 +1,12 @@
 package com.leeweeder.weighttracker.ui.home.components
 
-import android.graphics.Typeface
 import android.text.Layout
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.leeweeder.weighttracker.ui.home.util.WeightTrackerMarkerValueFormatter
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
@@ -29,8 +29,11 @@ import com.patrykandpatrick.vico.core.common.shape.Shape
 @Composable
 internal fun rememberMarker(): CartesianMarker {
     val labelBackgroundShape = Shape.markerCornered(Corner.FullyRounded)
+    val context = LocalContext.current
+    val bgColor = Color(context.getColor(android.R.color.system_neutral1_10))
+    val color = Color(context.getColor(android.R.color.system_accent1_400))
     val labelBackground =
-        rememberShapeComponent(labelBackgroundShape, MaterialTheme.colorScheme.surface)
+        rememberShapeComponent(labelBackgroundShape, bgColor)
             .setShadow(
                 radius = LABEL_BACKGROUND_SHADOW_RADIUS_DP,
                 dy = LABEL_BACKGROUND_SHADOW_DY_DP,
@@ -38,15 +41,14 @@ internal fun rememberMarker(): CartesianMarker {
             )
     val label =
         rememberTextComponent(
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
             background = labelBackground,
-            padding = Dimensions.of(8.dp, 4.dp),
-            typeface = Typeface.MONOSPACE,
+            padding = Dimensions.of(12.dp, 8.dp),
             textAlignment = Layout.Alignment.ALIGN_CENTER,
             minWidth = TextComponent.MinWidth.fixed(40.dp),
         )
     val indicatorFrontComponent =
-        rememberShapeComponent(Shape.Pill, MaterialTheme.colorScheme.surface)
+        rememberShapeComponent(Shape.Pill, bgColor)
     val indicatorCenterComponent = rememberShapeComponent(Shape.Pill)
     val indicatorRearComponent = rememberShapeComponent(Shape.Pill)
     val indicator =
@@ -56,13 +58,17 @@ internal fun rememberMarker(): CartesianMarker {
             rememberLayeredComponent(
                 rear = indicatorCenterComponent,
                 front = indicatorFrontComponent,
-                padding = Dimensions.of(4.dp),
+                padding = Dimensions.of(2.dp),
             ),
             padding = Dimensions.of(6.dp),
         )
-    val guideline = rememberAxisGuidelineComponent()
+    val guideline = rememberAxisGuidelineComponent(
+        thickness = 2.dp,
+        color = MaterialTheme.colorScheme.outlineVariant
+    )
+    val primaryColor = color.toArgb()
     val valueFormatter = remember {
-        WeightTrackerMarkerValueFormatter()
+        WeightTrackerMarkerValueFormatter(primaryColor)
     }
     return remember(label, indicator, guideline) {
         object :
