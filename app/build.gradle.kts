@@ -19,6 +19,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -68,10 +69,6 @@ android {
         buildConfig = false
         renderScript = false
         shaders = false
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
     }
 
     packaging {
@@ -140,4 +137,8 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
 
     implementation(libs.numberslider)
+}
+
+composeCompiler {
+    enableStrongSkippingMode = true
 }
