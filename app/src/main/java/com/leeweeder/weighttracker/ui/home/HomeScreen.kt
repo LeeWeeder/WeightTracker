@@ -183,7 +183,7 @@ fun HomeScreenContent(
                             contentAlignment = Alignment.Center
                         ) {
                             val textStyle = MaterialTheme.typography.bodySmall
-                            if (differenceFromGoal?.toInt() == 0) {
+                            if (differenceFromGoal == 0f) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.check_small),

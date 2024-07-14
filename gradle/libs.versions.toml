@@ -21,6 +21,8 @@ vico = "2.0.0-alpha.22"
 datastore = "1.1.1"
 splashscreen = "1.0.1"
 
+numberSlider = "1.0.1"
+
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
@@ -54,6 +56,8 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
 vico = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+
+numberslider = { group = "com.github.LeeWeeder", name = "NumberSlider", version.ref = "numberSlider"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
