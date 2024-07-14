@@ -26,6 +26,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { setUrl("https://www.jitpack.io") }
     }
 }
 rootProject.name = "WeightTracker"

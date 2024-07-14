@@ -69,6 +69,7 @@ class AddEditLogViewModel @Inject constructor(
                         _newlyAddedId.value = logUseCases.insertLog(
                             log = log
                         )
+                        android.util.Log.d("newlyAddedId", _newlyAddedId.value.toString())
                     }
                 }
             }

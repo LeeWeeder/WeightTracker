@@ -27,7 +27,7 @@ class GetLogsForWeek(
 
     fun getDaysOfWeek(date: LocalDate): List<LocalDate> {
         val daysOfWeek = mutableListOf<LocalDate>()
-        var currentDay = date.with(DayOfWeek.SUNDAY).minusWeeks(1)
+        var currentDay = date.with(DayOfWeek.SUNDAY)
 
         repeat(7) {
             daysOfWeek.add(currentDay)
