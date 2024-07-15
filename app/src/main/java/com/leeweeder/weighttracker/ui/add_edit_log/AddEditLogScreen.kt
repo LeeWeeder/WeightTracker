@@ -34,6 +34,7 @@ import com.leeweeder.numberslider.NumberSlider
 import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.AddEditLogSharedViewModel
 import com.leeweeder.weighttracker.ui.LocalNavController
+import com.leeweeder.weighttracker.ui.components.AlertDialog
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.util.toEpochMilli
 
@@ -102,6 +103,17 @@ internal fun AddEditLogScreen(
             DatePicker(state = datePickerState)
         }
     }
+    val isAlertDialogVisible = remember {
+        mutableStateOf(false)
+    }
+
+    AlertDialog(
+        visible = isAlertDialogVisible.value,
+        onDismissRequest = { isAlertDialogVisible.value = false },
+        title = "Weight value can't be zero",
+        text = "Please enter a value greater than zero."
+    )
+
     Scaffold(
         topBar = {
             LargeTopAppBar(
@@ -113,6 +125,10 @@ internal fun AddEditLogScreen(
                 },
                 actions = {
                     TextButton(onClick = {
+                        if (uiState.weight.value == 0f) {
+                            isAlertDialogVisible.value = true
+                            return@TextButton
+                        }
                         onEvent(AddEditLogEvent.SaveLog)
                         navController.navigateUp()
                     }) {
@@ -181,7 +197,7 @@ internal fun AddEditLogScreen(
 
             NumberSlider(value = uiState.weight.value, onValueChange = {
                 onEvent(AddEditLogEvent.SetWeight(it))
-            }, modifier = Modifier.padding(top = 64.dp))
+            }, modifier = Modifier.padding(top = 64.dp), maxValue = 400, minValue = 0)
         }
     }
 }

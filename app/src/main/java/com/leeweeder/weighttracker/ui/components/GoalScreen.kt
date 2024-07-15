@@ -13,13 +13,11 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,25 +44,15 @@ fun GoalScreen(
     val goalWeightState = remember {
         mutableStateOf(initialValue.toString())
     }
-    if (isValidationDialogVisible.value) {
-        AlertDialog(
-            onDismissRequest = { isValidationDialogVisible.value = false },
-            confirmButton = {
-                TextButton(onClick = { isValidationDialogVisible.value = false }) {
-                    Text(text = "Okay")
-                }
-            },
-            icon = {
-                Icon(painter = painterResource(id = R.drawable.error), contentDescription = null)
-            },
-            title = {
-                Text(text = "Can't set goal")
-            },
-            text = {
-                Text(text = if (goalWeightState.value.isEmpty()) "Enter a value to set your goal." else "Goal weight must be greater than 0.")
-            }
-        )
-    }
+    AlertDialog(
+        visible = isValidationDialogVisible.value,
+        onDismissRequest = { isValidationDialogVisible.value = false },
+        title = "Can't set goal",
+        text = if (goalWeightState.value.isEmpty())
+            "Enter a value to set your goal."
+        else
+            "Goal weight must be greater than 0."
+    )
 
     Column(
         modifier = Modifier
@@ -84,7 +72,7 @@ fun GoalScreen(
                 }
                 val value = it.toIntOrNull() ?: return@GoalWeightTextField
                 if (value < 0) return@GoalWeightTextField
-                if (it.length > 3) return@GoalWeightTextField
+                if (value > 400) return@GoalWeightTextField
                 goalWeightState.value = value.toString()
             }
             Spacer(modifier = Modifier.height(24.dp))
@@ -119,9 +107,9 @@ fun GoalScreen(
                             return@ControlButton
                         }
                         val value = goalWeightState.value.toInt()
-                        val potentialValue = (value + 1).toString()
-                        if (potentialValue.length <= 3) {
-                            goalWeightState.value = potentialValue
+                        val potentialValue = (value + 1)
+                        if (potentialValue <= 400) {
+                            goalWeightState.value = potentialValue.toString()
                         }
                     }
                 )

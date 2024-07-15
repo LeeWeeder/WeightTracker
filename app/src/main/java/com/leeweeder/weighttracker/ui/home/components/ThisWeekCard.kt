@@ -48,16 +48,19 @@ internal fun ThisWeekCard(weekRange: WeekRange, lineChartData: LineChartData, lo
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             SectionLabel(text = "This week")
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = weekRange.format("MMM d"),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                val minWeight = logs.minOf { it.weight.value }
-                val maxWeight = logs.maxOf { it.weight.value }
+                val minWeight = logs.minOfOrNull { it.weight.value }
+                val maxWeight = logs.maxOfOrNull { it.weight.value }
                 val weightRange =
-                    if (minWeight == maxWeight) "$minWeight kg" else "$minWeight–$maxWeight kg"
+                    if (minWeight == null && maxWeight == null) "No data" else if (minWeight == maxWeight) "$minWeight kg" else "$minWeight–$maxWeight kg"
                 Text(
                     text = weightRange,
                     style = MaterialTheme.typography.bodySmall,
