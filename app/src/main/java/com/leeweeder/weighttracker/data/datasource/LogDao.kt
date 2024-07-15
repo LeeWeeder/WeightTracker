@@ -20,7 +20,7 @@ interface LogDao {
     suspend fun getLogById(id: Int): Log
 
     @Query("SELECT * FROM log WHERE date = :millis")
-    suspend fun getLogByDate(millis: Long): Log
+    suspend fun getLogByDate(millis: Long): Log?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLog(log: Log): Long

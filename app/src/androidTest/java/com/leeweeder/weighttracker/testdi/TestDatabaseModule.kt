@@ -18,7 +18,7 @@ import com.leeweeder.weighttracker.domain.usecases.log.DeleteLogById
 import com.leeweeder.weighttracker.domain.usecases.log.GetLogByDate
 import com.leeweeder.weighttracker.domain.usecases.log.GetLogById
 import com.leeweeder.weighttracker.domain.usecases.log.GetLogs
-import com.leeweeder.weighttracker.domain.usecases.log.GetLogsForWeek
+import com.leeweeder.weighttracker.domain.usecases.log.GetLogsForThisWeek
 import com.leeweeder.weighttracker.domain.usecases.log.InsertLog
 import com.leeweeder.weighttracker.domain.usecases.log.UpdateLog
 import dagger.Module
@@ -56,7 +56,7 @@ object TestAppModule {
             insertLog = InsertLog(repository),
             deleteLogById = DeleteLogById(repository),
             updateLog = UpdateLog(repository),
-            getLogsForWeek = GetLogsForWeek(repository),
+            getLogsForThisWeek = GetLogsForThisWeek(repository),
             getLogByDate = GetLogByDate(repository)
         )
     }

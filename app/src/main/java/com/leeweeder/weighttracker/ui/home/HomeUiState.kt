@@ -1,6 +1,8 @@
 package com.leeweeder.weighttracker.ui.home
 
 import com.leeweeder.weighttracker.domain.model.Log
+import com.leeweeder.weighttracker.util.daysOfWeek
+import java.time.LocalDate
 
 data class HomeUiState(
     val logsForThisWeek: List<Log> = emptyList(),
@@ -25,4 +27,8 @@ data class HomeUiState(
         get() = mostRecentLog?.weight?.value?.let {
             goalWeight.minus(it)
         }
+
+    val today: LocalDate = LocalDate.now()
+
+    val daysOfWeek = today.daysOfWeek
 }

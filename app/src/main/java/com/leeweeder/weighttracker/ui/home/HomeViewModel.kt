@@ -39,10 +39,6 @@ class HomeViewModel @Inject constructor(
     val modelProducer
         get() = _modelProducer
 
-    private val today = LocalDate.now()
-    private val _daysOfWeek = mutableStateOf(logUseCases.getLogsForWeek.getDaysOfWeek(today))
-    val daysOfWeek: State<List<LocalDate>> = _daysOfWeek
-
     init {
         getLogsForWeek()
         viewModelScope.launch {
@@ -54,7 +50,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun observeMostRecentLogsAndGoalWeight() {
+    fun observeThisWeekLogsAndGoalWeight() {
         viewModelScope.launch {
             snapshotFlow {
                 homeUiState.value.logsForThisWeek
@@ -70,15 +66,20 @@ class HomeViewModel @Inject constructor(
 
     private fun loadLineChart() {
         val originalData =
-            homeUiState.value.logsForThisWeek.also { if (it.isEmpty()) return }.reversed()
-
-        val data = originalData.associate {
-            it.date to it.weight.value
-        }
-
-        val xToDates = data.keys.associateBy { it.toEpochDay().toFloat() }
+            homeUiState.value.logsForThisWeek.also { if (it.isEmpty()) return }
 
         viewModelScope.launch {
+            val precedingDay =
+                logUseCases.getLogByDate(homeUiState.value.daysOfWeek.first().minusDays(1))
+
+            val data = originalData.associate {
+                it.date to it.weight.value
+            }.toMutableMap().also {
+                if (precedingDay != null) it[precedingDay.date] = precedingDay.weight.value
+            }.toSortedMap().toMap()
+
+            val xToDates = data.keys.associateBy { it.toEpochDay().toFloat() }
+
             modelProducer.runTransaction {
                 lineSeries {
                     series(
@@ -97,7 +98,7 @@ class HomeViewModel @Inject constructor(
                         extraStore[mostRecentLogDayOfTheWeekKey] =
                             mostRecentLog.date.toEpochDay().toFloat()
                     extraStore[xToDateMapKey] = xToDates
-                    extraStore[daysOfTheWeek] = daysOfWeek.value
+                    extraStore[daysOfTheWeek] = homeUiState.value.daysOfWeek
                 }
             }
         }
@@ -111,7 +112,7 @@ class HomeViewModel @Inject constructor(
 
     private fun getLogsForWeek() {
         getLogsForWeekJob?.cancel()
-        getLogsForWeekJob = logUseCases.getLogsForWeek(today)
+        getLogsForWeekJob = logUseCases.getLogsForThisWeek(homeUiState.value.today)
             .onEach { logs ->
                 _homeUiState.value = homeUiState.value.copy(
                     logsForThisWeek = logs
