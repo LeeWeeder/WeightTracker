@@ -67,6 +67,10 @@ internal fun AddEditLogScreen(
         }
     }
 
+    val textFieldValue = remember {
+        mutableStateOf("")
+    }
+
     val navController = LocalNavController.current
     if (uiState.datePickerDialogVisible) {
         val datePickerState =
@@ -125,12 +129,19 @@ internal fun AddEditLogScreen(
                 },
                 actions = {
                     TextButton(onClick = {
-                        if (uiState.weight.value == 0f) {
-                            isAlertDialogVisible.value = true
-                            return@TextButton
-                        }
-                        onEvent(AddEditLogEvent.SaveLog)
-                        navController.navigateUp()
+                        onEvent(
+                            AddEditLogEvent.SetWeight(
+                                value = textFieldValue.value.toFloatOrNull() ?: 0f,
+                                onWeightSet = { weight ->
+                                    if (weight == 0f) {
+                                        isAlertDialogVisible.value = true
+                                        return@SetWeight
+                                    } else {
+                                        onEvent(AddEditLogEvent.SaveLog)
+                                        navController.navigateUp()
+                                    }
+                                })
+                        )
                     }) {
                         Text(text = "Save")
                     }
@@ -195,9 +206,17 @@ internal fun AddEditLogScreen(
             )
             ListItem(headlineContent = { Text(text = "Weight", style = labelStyle) })
 
-            NumberSlider(value = uiState.weight.value, onValueChange = {
-                onEvent(AddEditLogEvent.SetWeight(it))
-            }, modifier = Modifier.padding(top = 64.dp), maxValue = 400, minValue = 0)
+            NumberSlider(
+                value = uiState.weight.value,
+                onValueChange = {
+                    onEvent(AddEditLogEvent.SetWeight(it))
+                },
+                modifier = Modifier.padding(top = 64.dp),
+                maxValue = 400,
+                minValue = 0,
+                onTextFieldValueChange = {
+                    textFieldValue.value = it
+                })
         }
     }
 }

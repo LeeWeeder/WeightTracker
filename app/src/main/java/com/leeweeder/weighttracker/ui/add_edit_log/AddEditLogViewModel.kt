@@ -84,6 +84,7 @@ class AddEditLogViewModel @Inject constructor(
                 _addEditLogUiState.value = addEditLogUiState.value.copy(
                     weight = Weight(event.value)
                 )
+                event.onWeightSet?.let {  it(addEditLogUiState.value.weight.value) }
             }
 
             AddEditLogEvent.DeleteLog -> {
