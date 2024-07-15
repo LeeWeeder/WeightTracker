@@ -20,7 +20,7 @@ class LogRepositoryImpl(
         return dao.getLogById(id)
     }
 
-    override suspend fun getLogByDate(epochDay: Long): Log {
+    override suspend fun getLogByDate(epochDay: Long): Log? {
         return dao.getLogByDate(epochDay)
     }
 

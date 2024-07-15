@@ -35,7 +35,7 @@ import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.AddEditLogSharedViewModel
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.util.format
-import com.leeweeder.weighttracker.ui.util.toEpochMilli
+import com.leeweeder.weighttracker.util.toEpochMilli
 
 @Composable
 fun AddEditLogScreen(

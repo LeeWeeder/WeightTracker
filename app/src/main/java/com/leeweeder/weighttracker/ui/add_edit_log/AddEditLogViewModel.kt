@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.domain.usecases.LogUseCases
-import com.leeweeder.weighttracker.ui.util.epochMillisToLocalDate
 import com.leeweeder.weighttracker.util.Weight
+import com.leeweeder.weighttracker.util.epochMillisToLocalDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

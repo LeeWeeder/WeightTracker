@@ -1,6 +1,5 @@
 package com.leeweeder.weighttracker.ui.home
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,11 +19,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
@@ -41,7 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -50,13 +45,14 @@ import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.MainActivityViewModel
 import com.leeweeder.weighttracker.ui.home.components.GoalScreenDialog
-import com.leeweeder.weighttracker.ui.home.components.LineChart
+import com.leeweeder.weighttracker.ui.home.components.ThisWeekCard
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.ui.util.formatToOneDecimalPlace
+import com.leeweeder.weighttracker.ui.util.model.LineChartData
+import com.leeweeder.weighttracker.ui.util.model.WeekRange
 import com.leeweeder.weighttracker.util.Screen
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import kotlin.math.absoluteValue
 
 @Composable
@@ -66,21 +62,16 @@ fun HomeScreen(
     onNavigateToOnBoardingScreen: () -> Unit,
     fromOnBoarding: Boolean
 ) {
-    val navController = LocalNavController.current
     val uiState = homeViewModel.homeUiState.value
-    val onNavigateToAddEditLogScreen = { navController.navigate(Screen.AddEditLogScreen.route) }
-    val onWeightGoalSet = homeViewModel::setGoalWeight
-    val daysOfWeekState = homeViewModel.daysOfWeek.value
-    val observeFiveMostRecentLogsAndGoalWeight = homeViewModel::observeMostRecentLogsAndGoalWeight
+    val setGoalWeight = homeViewModel::setGoalWeight
+    val observeThisWeekLogsAndGoalWeight = homeViewModel::observeThisWeekLogsAndGoalWeight
     val modelProducer = homeViewModel.modelProducer
 
     val homeScreen = @Composable {
         HomeScreen(
             uiState = uiState,
-            onNavigateToAddEditLogScreen = onNavigateToAddEditLogScreen,
-            onWeightGoalSet = onWeightGoalSet,
-            daysOfWeekState = daysOfWeekState,
-            observeFiveMostRecentLogsAndGoalWeight = observeFiveMostRecentLogsAndGoalWeight,
+            onWeightGoalSet = setGoalWeight,
+            observeThisWeekLogsAndGoalWeight = observeThisWeekLogsAndGoalWeight,
             modelProducer = modelProducer
         )
     }
@@ -108,15 +99,14 @@ fun HomeScreen(
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
-    onNavigateToAddEditLogScreen: () -> Unit = {},
     onWeightGoalSet: (weight: Int) -> Unit,
-    daysOfWeekState: List<LocalDate>,
-    observeFiveMostRecentLogsAndGoalWeight: () -> Unit,
+    observeThisWeekLogsAndGoalWeight: () -> Unit,
     modelProducer: CartesianChartModelProducer
 ) {
     val goalScreenDialogVisible = remember {
         mutableStateOf(false)
     }
+    val navController = LocalNavController.current
     GoalScreenDialog(
         visible = goalScreenDialogVisible.value,
         initialValue = uiState.goalWeight,
@@ -127,7 +117,7 @@ fun HomeScreen(
     }
     Scaffold(
         floatingActionButton = {
-            AddWeightRecordFab(onClick = onNavigateToAddEditLogScreen)
+            AddWeightRecordFab(onClick = { navController.navigate(Screen.AddEditLogScreen.route) })
         },
         topBar = { WeightTrackerTopAppBar() }
     ) {
@@ -140,8 +130,7 @@ fun HomeScreen(
             showGoalScreen = {
                 goalScreenDialogVisible.value = true
             },
-            daysOfWeekState = daysOfWeekState,
-            observeFiveMostRecentLogsAndGoalWeight = observeFiveMostRecentLogsAndGoalWeight,
+            observeThisWeekLogsAndGoalWeight = observeThisWeekLogsAndGoalWeight,
             modelProducer = modelProducer
         )
     }
@@ -152,8 +141,7 @@ fun HomeScreenContent(
     uiState: HomeUiState,
     paddingValues: PaddingValues,
     showGoalScreen: () -> Unit,
-    daysOfWeekState: List<LocalDate>,
-    observeFiveMostRecentLogsAndGoalWeight: () -> Unit,
+    observeThisWeekLogsAndGoalWeight: () -> Unit,
     modelProducer: CartesianChartModelProducer
 ) {
     Column(
@@ -229,55 +217,16 @@ fun HomeScreenContent(
         }
         Spacer(modifier = Modifier.height(16.dp))
         Spacer(modifier = Modifier.height(24.dp))
-        ElevatedCard(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.large
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                SectionLabel(title = "Trend")
-                Text(
-                    text = "${daysOfWeekState.first().format("MMM d")} - ${
-                        daysOfWeekState.last().format("MMM d")
-                    }",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                IconButton(onClick = { }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.chevron_forward),
-                        contentDescription = "See more"
-                    )
-                }
-            }
-            LineChart(
+        val daysOfWeek = uiState.daysOfWeek
+        ThisWeekCard(
+            weekRange = WeekRange(start = daysOfWeek.first(), end = daysOfWeek.last()),
+            lineChartData = LineChartData(
                 modelProducer = modelProducer,
-                observeFiveMostRecentLogsAndGoalWeight = observeFiveMostRecentLogsAndGoalWeight,
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .padding(horizontal = 12.dp)
-            )
-        }
+                dataObserver = observeThisWeekLogsAndGoalWeight
+            ),
+            logs = uiState.logsForThisWeek
+        )
     }
-}
-
-@Composable
-private fun SectionLabel(
-    title: String,
-    modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.secondary
-) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleMedium,
-        color = color,
-        modifier = modifier
-    )
 }
 
 @Composable
@@ -291,38 +240,6 @@ private fun AddWeightRecordFab(onClick: () -> Unit) {
             contentDescription = "Add weight record",
             modifier = Modifier.size(FloatingActionButtonDefaults.LargeIconSize)
         )
-    }
-}
-
-@Composable
-fun NoData() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.no_data),
-            contentDescription = "No data available",
-            alpha = 0.3f,
-            modifier = Modifier.size(128.dp)
-        )
-        val style = MaterialTheme.typography.bodyMedium
-        Text(
-            text = "No data available",
-            color = MaterialTheme.colorScheme.outlineVariant,
-            style = style
-        )
-        Spacer(modifier = Modifier.height(2.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "Click ", color = MaterialTheme.colorScheme.outline, style = style)
-            Icon(
-                painter = painterResource(id = R.drawable.add_weight_record),
-                contentDescription = null,
-                modifier = Modifier.size(16.dp)
-            )
-            Text(text = " to add one", color = MaterialTheme.colorScheme.outline, style = style)
-        }
-        Spacer(modifier = Modifier.height(40.dp))
     }
 }
 
