@@ -1,6 +1,7 @@
 package com.leeweeder.weighttracker.domain.usecases
 
 import com.leeweeder.weighttracker.domain.usecases.log.DeleteLogById
+import com.leeweeder.weighttracker.domain.usecases.log.GetLatestLogs
 import com.leeweeder.weighttracker.domain.usecases.log.GetLogByDate
 import com.leeweeder.weighttracker.domain.usecases.log.GetLogById
 import com.leeweeder.weighttracker.domain.usecases.log.GetLogs
@@ -15,5 +16,6 @@ data class LogUseCases(
     val insertLog: InsertLog,
     val updateLog: UpdateLog,
     val deleteLogById: DeleteLogById,
-    val getLogsForThisWeek: GetLogsForThisWeek
+    val getLogsForThisWeek: GetLogsForThisWeek,
+    val getLatestLogs: GetLatestLogs
 )
