@@ -12,6 +12,10 @@ class LogRepositoryImpl(
         return dao.getLogs()
     }
 
+    override fun getLatestLogs(number: Int): Flow<List<Log>> {
+        return dao.getLatestLogs(number)
+    }
+
     override fun getLogsAroundDate(epochDay: Long, padding: Int): Flow<List<Log>> {
         return dao.getLogsAroundDate(epochDay, padding)
     }

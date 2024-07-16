@@ -13,6 +13,9 @@ interface LogDao {
     @Query("SELECT * FROM log ORDER BY date DESC")
     fun getLogs(): Flow<List<Log>>
 
+    @Query("SELECT * FROM log ORDER BY date DESC LIMIT :number")
+    fun getLatestLogs(number: Int): Flow<List<Log>>
+
     @Query("SELECT * FROM log WHERE date BETWEEN :epochDay - :padding AND :epochDay + :padding ORDER BY date ASC")
     fun getLogsAroundDate(epochDay: Long, padding: Int): Flow<List<Log>>
 
