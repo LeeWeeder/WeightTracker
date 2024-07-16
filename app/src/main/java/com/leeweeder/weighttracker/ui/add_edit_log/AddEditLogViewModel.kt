@@ -6,10 +6,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leeweeder.weighttracker.domain.model.Log
+import com.leeweeder.weighttracker.domain.usecases.DataStoreUseCases
 import com.leeweeder.weighttracker.domain.usecases.LogUseCases
-import com.leeweeder.weighttracker.util.Weight
 import com.leeweeder.weighttracker.util.epochMillisToLocalDate
+import com.leeweeder.weighttracker.util.toWeight
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,6 +21,7 @@ const val LOG_ID_KEY = "logId"
 @HiltViewModel
 class AddEditLogViewModel @Inject constructor(
     private val logUseCases: LogUseCases,
+    private val dataStoreUseCases: DataStoreUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _addEditLogUiState = mutableStateOf(AddEditLogUiState())
@@ -35,6 +39,16 @@ class AddEditLogViewModel @Inject constructor(
                             currentLogId = log.id,
                             date = log.date,
                             weight = log.weight
+                        )
+                    }
+                }
+            } else {
+                viewModelScope.launch {
+                    logUseCases.getLatestLogs().firstOrNull()?.let { logs ->
+                        _addEditLogUiState.value = addEditLogUiState.value.copy(
+                            weight = logs.firstOrNull()?.weight
+                                ?: dataStoreUseCases.readGoalWeightState().first().toFloat()
+                                    .toWeight()
                         )
                     }
                 }
@@ -59,7 +73,11 @@ class AddEditLogViewModel @Inject constructor(
 
                 viewModelScope.launch {
                     if (currentLogId != -1) {
-                        val log = Log(id = currentLogId, weight = currentWeight, date = currentDate)
+                        val log = Log(
+                            id = currentLogId,
+                            weight = currentWeight,
+                            date = currentDate
+                        )
                         logUseCases.updateLog(
                             log = log
                         )
@@ -69,7 +87,6 @@ class AddEditLogViewModel @Inject constructor(
                         _newlyAddedId.value = logUseCases.insertLog(
                             log = log
                         )
-                        android.util.Log.d("newlyAddedId", _newlyAddedId.value.toString())
                     }
                 }
             }
@@ -81,10 +98,10 @@ class AddEditLogViewModel @Inject constructor(
             }
 
             is AddEditLogEvent.SetWeight -> {
-                _addEditLogUiState.value = addEditLogUiState.value.copy(
-                    weight = Weight(event.value)
+                val uiState = addEditLogUiState.value
+                _addEditLogUiState.value = uiState.copy(
+                    weight = event.value.toWeight()
                 )
-                event.onWeightSet?.let {  it(addEditLogUiState.value.weight.value) }
             }
 
             AddEditLogEvent.DeleteLog -> {

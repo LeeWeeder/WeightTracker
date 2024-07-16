@@ -40,7 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.leeweeder.weighttracker.R
-import com.leeweeder.weighttracker.ui.util.isKeyboardClosing
+import com.leeweeder.weighttracker.ui.util.SoftKeyboardController
 
 @Composable
 fun GoalScreen(
@@ -72,7 +72,7 @@ fun GoalScreen(
     )
     val focusManager = LocalFocusManager.current
 
-    val isKeyboardClosing = isKeyboardClosing()
+    val isKeyboardClosing = SoftKeyboardController.isClosing()
 
     LaunchedEffect(key1 = isKeyboardClosing) {
         if (isKeyboardClosing) {
