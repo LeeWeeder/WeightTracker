@@ -19,15 +19,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,13 +46,21 @@ fun GoalScreen(
         mutableStateOf(false)
     }
     val goalWeightState = remember {
-        mutableStateOf(initialValue.toString())
+        mutableStateOf(TextFieldValue(text = initialValue.toString()))
+    }
+    val keepWholeSelection = remember {
+        mutableStateOf(false)
+    }
+    if (keepWholeSelection.value) {
+        SideEffect {
+            keepWholeSelection.value = false
+        }
     }
     AlertDialog(
         visible = isValidationDialogVisible.value,
         onDismissRequest = { isValidationDialogVisible.value = false },
         title = "Can't set goal",
-        text = if (goalWeightState.value.isEmpty())
+        text = if (goalWeightState.value.text.isEmpty())
             "Enter a value to set your goal."
         else
             "Goal weight must be greater than 0."
@@ -65,15 +77,29 @@ fun GoalScreen(
             modifier = Modifier.weight(1f)
         ) {
             Spacer(modifier = Modifier.height(150.dp))
-            GoalWeightTextField(value = goalWeightState.value) {
-                if (it.isEmpty()) {
-                    goalWeightState.value = it
+            GoalWeightTextField(
+                value = goalWeightState.value,
+                modifier = Modifier.onFocusChanged { focusState ->
+                    if (focusState.isFocused) {
+                        val text = goalWeightState.value.text
+                        goalWeightState.value =
+                            goalWeightState.value.copy(selection = TextRange(0, text.length))
+                        keepWholeSelection.value = true
+                    }
+                }) { newValue ->
+                if (newValue.text.isEmpty()) {
+                    goalWeightState.value = newValue
                     return@GoalWeightTextField
                 }
-                val value = it.toIntOrNull() ?: return@GoalWeightTextField
+                val value = newValue.text.toIntOrNull() ?: return@GoalWeightTextField
                 if (value < 0) return@GoalWeightTextField
                 if (value > 500) return@GoalWeightTextField
-                goalWeightState.value = value.toString()
+                if (keepWholeSelection.value) {
+                    keepWholeSelection.value = false
+                    goalWeightState.value = newValue.copy(text = value.toString(), selection = TextRange(0, newValue.text.length))
+                } else {
+                    goalWeightState.value = newValue
+                }
             }
             Spacer(modifier = Modifier.height(24.dp))
             Text(text = "KILOGRAMS", style = MaterialTheme.typography.titleLarge)
@@ -87,13 +113,14 @@ fun GoalScreen(
                     modifier = Modifier.weight(1f),
                     position = ControlButtonPosition.Left,
                     onClick = {
-                        if (goalWeightState.value.isEmpty()) {
-                            goalWeightState.value = "0"
+                        val goalWeight = goalWeightState.value
+                        if (goalWeight.text.isEmpty()) {
+                            goalWeightState.value = goalWeight.copy(text = "0")
                             return@ControlButton
                         }
-                        val value = goalWeightState.value.toInt()
+                        val value = goalWeight.text.toInt()
                         if (value > 0) {
-                            goalWeightState.value = (value - 1).toString()
+                            goalWeightState.value = goalWeight.copy(text = (value - 1).toString())
                         }
                     }
                 )
@@ -102,14 +129,16 @@ fun GoalScreen(
                     modifier = Modifier.weight(1f),
                     position = ControlButtonPosition.Right,
                     onClick = {
-                        if (goalWeightState.value.isEmpty()) {
-                            goalWeightState.value = "1"
+                        val goalWeight = goalWeightState.value
+                        if (goalWeight.text.isEmpty()) {
+                            goalWeightState.value = goalWeight.copy(text = "1")
                             return@ControlButton
                         }
-                        val value = goalWeightState.value.toInt()
+                        val value = goalWeight.text.toInt()
                         val potentialValue = (value + 1)
                         if (potentialValue <= 500) {
-                            goalWeightState.value = potentialValue.toString()
+                            goalWeightState.value =
+                                goalWeight.copy(text = potentialValue.toString())
                         }
                     }
                 )
@@ -118,12 +147,12 @@ fun GoalScreen(
         Button(
             onClick = {
                 val goalWeight = goalWeightState.value
-                if (goalWeight.isEmpty() || goalWeight.toInt() == 0) {
+                if (goalWeight.text.isEmpty() || goalWeight.text.toInt() == 0) {
                     isValidationDialogVisible.value = true
                     return@Button
                 }
 
-                onWeightGoalSet(goalWeight.toInt())
+                onWeightGoalSet(goalWeight.text.toInt())
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -187,7 +216,11 @@ private fun ControlButton(
 }
 
 @Composable
-private fun GoalWeightTextField(value: String, onValueChange: (String) -> Unit) {
+private fun GoalWeightTextField(
+    value: TextFieldValue,
+    modifier: Modifier = Modifier,
+    onValueChange: (TextFieldValue) -> Unit
+) {
     val fontSize = (MaterialTheme.typography.displayLarge.fontSize.value + 36f).sp
     BasicTextField(
         value = value,
@@ -199,12 +232,12 @@ private fun GoalWeightTextField(value: String, onValueChange: (String) -> Unit) 
             textAlign = TextAlign.Center
         ),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        cursorBrush = if (value.isEmpty()) SolidColor(Color.Unspecified) else SolidColor(
+        cursorBrush = if (value.text.isEmpty()) SolidColor(Color.Unspecified) else SolidColor(
             MaterialTheme.colorScheme.primary
         ),
         decorationBox = { innerTextField ->
             Box(contentAlignment = Alignment.Center) {
-                if (value.isEmpty()) {
+                if (value.text.isEmpty()) {
                     Text(
                         text = "Goal weight",
                         style = MaterialTheme.typography.displayMedium,
@@ -215,6 +248,7 @@ private fun GoalWeightTextField(value: String, onValueChange: (String) -> Unit) 
                 }
                 innerTextField()
             }
-        }
+        },
+        modifier = modifier
     )
 }
