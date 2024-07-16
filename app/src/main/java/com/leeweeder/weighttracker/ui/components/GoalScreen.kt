@@ -1,5 +1,7 @@
 package com.leeweeder.weighttracker.ui.components
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.leeweeder.weighttracker.R
+import com.leeweeder.weighttracker.ui.util.isKeyboardClosing
 
 @Composable
 fun GoalScreen(
@@ -65,12 +70,26 @@ fun GoalScreen(
         else
             "Goal weight must be greater than 0."
     )
+    val focusManager = LocalFocusManager.current
+
+    val isKeyboardClosing = isKeyboardClosing()
+
+    LaunchedEffect(key1 = isKeyboardClosing) {
+        if (isKeyboardClosing) {
+            focusManager.clearFocus()
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
             .padding(horizontal = 16.dp)
+            .clickable(interactionSource = remember {
+                MutableInteractionSource()
+            }, indication = null, onClick = {
+                focusManager.clearFocus()
+            })
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -113,6 +132,7 @@ fun GoalScreen(
                     modifier = Modifier.weight(1f),
                     position = ControlButtonPosition.Left,
                     onClick = {
+                        focusManager.clearFocus()
                         val goalWeight = goalWeightState.value
                         if (goalWeight.text.isEmpty()) {
                             goalWeightState.value = goalWeight.copy(text = "0")
@@ -129,6 +149,7 @@ fun GoalScreen(
                     modifier = Modifier.weight(1f),
                     position = ControlButtonPosition.Right,
                     onClick = {
+                        focusManager.clearFocus()
                         val goalWeight = goalWeightState.value
                         if (goalWeight.text.isEmpty()) {
                             goalWeightState.value = goalWeight.copy(text = "1")
