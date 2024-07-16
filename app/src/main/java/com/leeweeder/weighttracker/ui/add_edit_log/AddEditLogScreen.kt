@@ -1,6 +1,7 @@
 package com.leeweeder.weighttracker.ui.add_edit_log
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -119,6 +121,8 @@ internal fun AddEditLogScreen(
         text = "Please enter a value greater than zero."
     )
 
+    val focusManager = LocalFocusManager.current
+
     Scaffold(
         topBar = {
             LargeTopAppBar(
@@ -180,7 +184,12 @@ internal fun AddEditLogScreen(
                         )
                     }
                 })
-        }
+        },
+        modifier = Modifier.clickable(interactionSource = remember {
+            MutableInteractionSource()
+        }, indication = null, onClick = {
+            focusManager.clearFocus()
+        })
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             val labelStyle = MaterialTheme.typography.labelLarge
