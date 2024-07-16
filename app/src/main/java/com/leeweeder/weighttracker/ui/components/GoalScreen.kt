@@ -72,7 +72,7 @@ fun GoalScreen(
                 }
                 val value = it.toIntOrNull() ?: return@GoalWeightTextField
                 if (value < 0) return@GoalWeightTextField
-                if (value > 400) return@GoalWeightTextField
+                if (value > 500) return@GoalWeightTextField
                 goalWeightState.value = value.toString()
             }
             Spacer(modifier = Modifier.height(24.dp))
@@ -108,7 +108,7 @@ fun GoalScreen(
                         }
                         val value = goalWeightState.value.toInt()
                         val potentialValue = (value + 1)
-                        if (potentialValue <= 400) {
+                        if (potentialValue <= 500) {
                             goalWeightState.value = potentialValue.toString()
                         }
                     }

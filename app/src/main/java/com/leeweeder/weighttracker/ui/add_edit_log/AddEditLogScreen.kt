@@ -216,7 +216,7 @@ internal fun AddEditLogScreen(
                     onEvent(AddEditLogEvent.SetWeight(it))
                 },
                 modifier = Modifier.padding(top = 64.dp),
-                maxValue = 400,
+                maxValue = 500,
                 minValue = 0,
                 onTextFieldValueChange = {
                     textFieldValue.value = it
