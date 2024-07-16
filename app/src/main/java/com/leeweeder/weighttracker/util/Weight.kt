@@ -9,4 +9,4 @@ data class Weight(
         get() = value.formatToOneDecimalPlace()
 }
 
-const val MAX_WEIGHT = 450f
+fun Float.toWeight(): Weight = Weight(this)

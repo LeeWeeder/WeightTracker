@@ -38,7 +38,9 @@ import com.leeweeder.weighttracker.ui.AddEditLogSharedViewModel
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.components.AlertDialog
 import com.leeweeder.weighttracker.ui.util.format
+import com.leeweeder.weighttracker.util.Weight
 import com.leeweeder.weighttracker.util.toEpochMilli
+import com.leeweeder.weighttracker.util.toWeight
 import java.time.LocalDate
 
 @Composable
@@ -70,8 +72,8 @@ internal fun AddEditLogScreen(
         }
     }
 
-    val textFieldValue = remember {
-        mutableStateOf("")
+    val textFieldValue = remember(uiState.weight) {
+        mutableStateOf(uiState.weight.toString())
     }
 
     val navController = LocalNavController.current
@@ -134,19 +136,25 @@ internal fun AddEditLogScreen(
                 },
                 actions = {
                     TextButton(onClick = {
-                        onEvent(
-                            AddEditLogEvent.SetWeight(
-                                value = textFieldValue.value.toFloatOrNull() ?: 0f,
-                                onWeightSet = { weight ->
-                                    if (weight == 0f) {
-                                        isAlertDialogVisible.value = true
-                                        return@SetWeight
-                                    } else {
-                                        onEvent(AddEditLogEvent.SaveLog)
-                                        navController.navigateUp()
-                                    }
-                                })
-                        )
+                        val textFieldWeightValue = textFieldValue.value.toFloatOrNull()
+                        val newWeight =
+                            if (textFieldWeightValue == null || uiState.weight == textFieldWeightValue.toWeight() || textFieldWeightValue == 0f) {
+                                uiState.weight
+                            } else {
+                                textFieldWeightValue.toWeight()
+                            }
+
+                        if (newWeight == Weight(0f)) {
+                            isAlertDialogVisible.value = true
+                            return@TextButton
+                        }
+
+                        if (newWeight != uiState.weight) {
+                            onEvent(AddEditLogEvent.SetWeight(newWeight.value))
+                        }
+
+                        onEvent(AddEditLogEvent.SaveLog)
+                        navController.navigateUp()
                     }) {
                         Text(text = "Save")
                     }
@@ -200,7 +208,8 @@ internal fun AddEditLogScreen(
                 trailingContent = {
                     val today = LocalDate.now()
                     val defaultPattern = "EEE, MMM d"
-                    val pattern = if (today.year == uiState.date.year) defaultPattern else "$defaultPattern, yyyy"
+                    val pattern =
+                        if (today.year == uiState.date.year) defaultPattern else "$defaultPattern, yyyy"
                     Text(
                         text = uiState.date.format(pattern, true),
                         modifier = Modifier
