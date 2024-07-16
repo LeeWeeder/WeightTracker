@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
@@ -207,10 +208,18 @@ fun HomeScreenContent(
                             text = "Goal",
                             style = MaterialTheme.typography.labelSmall
                         )
-                        Text(
-                            text = uiState.goalWeight.toString(),
-                            style = MaterialTheme.typography.titleLarge
-                        )
+                        Row(verticalAlignment = Alignment.Bottom) {
+                            Text(
+                                text = uiState.goalWeight.toString(),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            Text(
+                                text = "kg",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f),
+                                modifier = Modifier.offset(y = (-3).dp)
+                            )
+                        }
                     }
                 }
             }
@@ -280,14 +289,21 @@ fun CurrentWeight(uiState: HomeUiState) {
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
-            Text(
-                text = mostRecentLog?.weight?.displayValue ?: "-",
-                style = MaterialTheme.typography.displayLarge.copy(
-                    fontWeight = FontWeight.SemiBold
-                ),
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.weight(1f)
-            )
+            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = mostRecentLog?.weight?.displayValue ?: "-",
+                    style = MaterialTheme.typography.displayLarge.copy(
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "kg",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.offset(y = (-8).dp)
+                )
+            }
             val difference = uiState.mostRecentDifferenceFromPrevious
             val differenceText =
                 difference?.let {
