@@ -37,6 +37,7 @@ import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.components.AlertDialog
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.util.toEpochMilli
+import java.time.LocalDate
 
 @Composable
 fun AddEditLogScreen(
@@ -188,8 +189,11 @@ internal fun AddEditLogScreen(
                     Text(text = "Date", style = labelStyle)
                 },
                 trailingContent = {
+                    val today = LocalDate.now()
+                    val defaultPattern = "EEE, MMM d"
+                    val pattern = if (today.year == uiState.date.year) defaultPattern else "$defaultPattern, yyyy"
                     Text(
-                        text = uiState.date.format("EEE, MM d", true),
+                        text = uiState.date.format(pattern, true),
                         modifier = Modifier
                             .clip(MaterialTheme.shapes.small)
                             .clickable {
