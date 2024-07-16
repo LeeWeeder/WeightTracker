@@ -58,6 +58,10 @@ fun GoalScreenDialog(
 
             Surface {
                 Box(modifier = Modifier.fillMaxSize()) {
+                    GoalScreen(initialValue = initialValue) { weight ->
+                        onWeightGoalSet(weight)
+                        onDismissRequest()
+                    }
                     TopAppBar(title = { Text(text = "Set goal") }, navigationIcon = {
                         IconButton(onClick = onDismissRequest) {
                             Icon(
@@ -66,10 +70,6 @@ fun GoalScreenDialog(
                             )
                         }
                     }, modifier = Modifier.align(Alignment.TopCenter))
-                    GoalScreen(initialValue = initialValue) { weight ->
-                        onWeightGoalSet(weight)
-                        onDismissRequest()
-                    }
                 }
             }
         }
