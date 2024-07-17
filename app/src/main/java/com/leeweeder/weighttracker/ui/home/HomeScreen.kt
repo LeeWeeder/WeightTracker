@@ -138,7 +138,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun HomeScreenContent(
+private fun HomeScreenContent(
     uiState: HomeUiState,
     paddingValues: PaddingValues,
     showGoalScreen: () -> Unit,
