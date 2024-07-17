@@ -7,11 +7,7 @@ import kotlinx.coroutines.flow.Flow
 class GetLatestLogs(
     private val repository: LogRepository
 ) {
-    operator fun invoke(number: Int = Default.LATEST_LOG_NUMBER): Flow<List<Log>> {
+    operator fun invoke(number: Int = 1): Flow<List<Log>> {
         return repository.getLatestLogs(number)
     }
-}
-
-private object Default {
-    const val LATEST_LOG_NUMBER = 1
 }
