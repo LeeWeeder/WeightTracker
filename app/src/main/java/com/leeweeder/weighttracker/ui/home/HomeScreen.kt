@@ -284,14 +284,14 @@ fun CurrentWeight(uiState: HomeUiState) {
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Text(
-                    text = mostRecentLog?.date?.format("EEE, MMM d, yyyy", true) ?: "-",
+                    text = mostRecentLog?.date?.format("EEE, MMM d, yyyy", true) ?: NO_DATA_PLACEHOLDER,
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
             Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.Bottom) {
                 Text(
-                    text = mostRecentLog?.weight?.displayValue ?: "-",
+                    text = mostRecentLog?.weight?.displayValue ?: NO_DATA_PLACEHOLDER,
                     style = MaterialTheme.typography.displayLarge.copy(
                         fontWeight = FontWeight.SemiBold
                     ),
@@ -309,7 +309,7 @@ fun CurrentWeight(uiState: HomeUiState) {
                 difference?.let {
                     it.formatToOneDecimalPlace(showPlusSign = true) + " kg"
                 }
-                    ?: "-"
+                    ?: NO_DATA_PLACEHOLDER
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -339,3 +339,5 @@ fun CurrentWeight(uiState: HomeUiState) {
         }
     }
 }
+
+private const val NO_DATA_PLACEHOLDER = "-"
