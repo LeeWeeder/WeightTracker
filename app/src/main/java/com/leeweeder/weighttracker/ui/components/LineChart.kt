@@ -1,13 +1,10 @@
 package com.leeweeder.weighttracker.ui.components
 
-import android.graphics.Canvas
-import android.graphics.Paint
 import android.graphics.Typeface
 import android.text.Layout
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import android.text.style.ReplacementSpan
 import android.text.style.StyleSpan
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -20,15 +17,10 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.leeweeder.weighttracker.ui.home.daysOfTheWeek
-import com.leeweeder.weighttracker.ui.home.daysOfWeeksWithValuesKey
 import com.leeweeder.weighttracker.ui.home.goalWeightKey
-import com.leeweeder.weighttracker.ui.home.mostRecentLogDayOfTheWeekKey
-import com.leeweeder.weighttracker.ui.home.xToDateMapKey
 import com.leeweeder.weighttracker.ui.util.format
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLineComponent
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisTickComponent
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberEndAxis
 import com.patrykandpatrick.vico.compose.cartesian.decoration.rememberHorizontalLine
@@ -53,12 +45,12 @@ import com.patrykandpatrick.vico.core.cartesian.CartesianMeasureContext
 import com.patrykandpatrick.vico.core.cartesian.HorizontalDimensions
 import com.patrykandpatrick.vico.core.cartesian.HorizontalLayout
 import com.patrykandpatrick.vico.core.cartesian.Insets
+import com.patrykandpatrick.vico.core.cartesian.axis.AxisPosition
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.AxisValueOverrider
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModel
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarkerValueFormatter
@@ -80,14 +72,15 @@ import kotlin.math.roundToInt
 fun LineChart(
     modelProducer: CartesianChartModelProducer,
     dataObserver: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    bottomAxis: HorizontalAxis<AxisPosition.Horizontal.Bottom> = rememberBottomAxis()
 ) {
     LaunchedEffect(Unit) {
         dataObserver()
     }
 
     CartesianChartHost(
-        chart = rememberLineChart(),
+        chart = rememberLineChart(bottomAxis = bottomAxis),
         modelProducer = modelProducer,
         modifier = modifier,
         zoomState = rememberVicoZoomState(zoomEnabled = false),
@@ -98,83 +91,11 @@ fun LineChart(
     )
 }
 
-private class CircleBackgroundSpan(
-    private val backgroundColor: Color?,
-    private val textColor: Color,
-    private val borderColor: Color?
-) :
-    ReplacementSpan() {
-    override fun getSize(
-        paint: Paint,
-        text: CharSequence,
-        start: Int,
-        end: Int,
-        fm: Paint.FontMetricsInt?
-    ): Int {
-        return paint.measureText(text, start, end).toInt()
-    }
-
-    override fun draw(
-        canvas: Canvas,
-        text: CharSequence,
-        start: Int,
-        end: Int,
-        x: Float,
-        top: Int,
-        y: Int,
-        bottom: Int,
-        paint: Paint
-    ) {
-        val textHeight = bottom - top
-        val radius = textHeight / 1f
-
-        val textWidth = paint.measureText(text, start, end)
-        val centerX = x + textWidth / 2
-
-        if (backgroundColor != null) {
-            paint.color = backgroundColor.toArgb()
-            canvas.drawCircle(centerX, (top + bottom) / 2f, radius, paint)
-        }
-
-        paint.color = textColor.toArgb()
-
-        canvas.drawText(text, start, end, x, y.toFloat(), paint)
-
-        if (borderColor != null) {
-            paint.color = borderColor.toArgb()
-            paint.style = Paint.Style.STROKE
-            paint.strokeWidth = 3f
-            canvas.drawCircle(centerX, (top + bottom) / 2f, radius, paint)
-        }
-    }
-}
-
-private fun setSpan(
-    text: String,
-    backgroundColor: Color?,
-    textColor: Color,
-    borderColor: Color? = null
-): SpannableStringBuilder {
-    val spannable = SpannableStringBuilder(text)
-    val start = 0
-    val end = text.length
-    spannable.setSpan(
-        CircleBackgroundSpan(backgroundColor, textColor, borderColor),
-        start,
-        end,
-        SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE
-    )
-    spannable.setSpan(StyleSpan(Typeface.BOLD), start, end, 0)
-    return spannable
-}
-
 @Composable
-private fun rememberLineChart(): CartesianChart {
+private fun rememberLineChart(
+    bottomAxis: HorizontalAxis<AxisPosition.Horizontal.Bottom>
+): CartesianChart {
     val primaryColor = MaterialTheme.colorScheme.primary
-    val secondaryColor = MaterialTheme.colorScheme.secondary
-    val onSecondaryColor = MaterialTheme.colorScheme.onSecondary
-    val secondaryContainerColor = MaterialTheme.colorScheme.secondaryContainer
-    val onSecondaryContainerColor = MaterialTheme.colorScheme.onSecondaryContainer
 
     val weightLine = rememberLine(
         shader = DynamicShader.color(primaryColor),
@@ -210,62 +131,7 @@ private fun rememberLineChart(): CartesianChart {
             ),
             itemPlacer = VerticalAxis.ItemPlacer.count(count = { 3 })
         ),
-        bottomAxis = rememberBottomAxis(
-            label = rememberTextComponent(
-                margins = Dimensions.of(top = 10.dp, bottom = 10.dp),
-                textAlignment = Layout.Alignment.ALIGN_CENTER
-            ),
-            line = rememberAxisLineComponent(
-                thickness = 2.dp,
-                color = MaterialTheme.colorScheme.outlineVariant
-            ),
-            tick = rememberAxisTickComponent(
-                color = MaterialTheme.colorScheme.outlineVariant,
-                shape = Shape.Rectangle,
-                thickness = 2.dp
-            ),
-            guideline = null,
-            itemPlacer = remember {
-                HorizontalAxis.ItemPlacer.default(addExtremeLabelPadding = true)
-            },
-            valueFormatter = remember {
-                CartesianValueFormatter { x, chartValues, _ ->
-                    val extraStore = chartValues.model.extraStore
-                    val (backgroundColor, textColor, borderColor) = if (x == extraStore[mostRecentLogDayOfTheWeekKey])
-                        Triple(
-                            secondaryColor,
-                            onSecondaryColor,
-                            secondaryColor
-                        )
-                    else if (extraStore[daysOfWeeksWithValuesKey].contains(x))
-                        Triple(
-                            secondaryContainerColor,
-                            onSecondaryContainerColor,
-                            secondaryContainerColor
-                        )
-                    else if (x == LocalDate.now().dayOfWeek.value.toFloat())
-                        Triple(
-                            null,
-                            secondaryColor,
-                            secondaryColor
-                        )
-                    else
-                        Triple(
-                            null,
-                            secondaryColor,
-                            secondaryContainerColor
-                        )
-                    setSpan(
-                        (chartValues.model.extraStore[xToDateMapKey][x] ?: LocalDate.ofEpochDay(
-                            x.toLong()
-                        )).format("E").first().toString(),
-                        backgroundColor,
-                        textColor,
-                        borderColor
-                    )
-                }
-            }
-        ),
+        bottomAxis = bottomAxis,
         decorations = listOf(
             rememberHorizontalLine(
                 y = { it[goalWeightKey] },
