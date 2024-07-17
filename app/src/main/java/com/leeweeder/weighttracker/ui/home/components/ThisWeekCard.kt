@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import com.leeweeder.weighttracker.domain.model.Log
+import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.components.LineChart
 import com.leeweeder.weighttracker.ui.components.LogItem
 import com.leeweeder.weighttracker.ui.components.NoData
@@ -40,6 +41,7 @@ import com.leeweeder.weighttracker.ui.home.xToDateMapKey
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.ui.util.model.LineChartData
 import com.leeweeder.weighttracker.ui.util.model.WeekRange
+import com.leeweeder.weighttracker.util.Screen
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLineComponent
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisTickComponent
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
@@ -54,7 +56,11 @@ import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun ThisWeekCard(weekRange: WeekRange, lineChartData: LineChartData, logs: List<Log>) {
+internal fun ThisWeekCard(
+    weekRange: WeekRange,
+    lineChartData: LineChartData,
+    logs: List<Log>
+) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
@@ -90,7 +96,10 @@ internal fun ThisWeekCard(weekRange: WeekRange, lineChartData: LineChartData, lo
                     color = MaterialTheme.colorScheme.outline
                 )
             }
-            TextButton(onClick = { }) {
+            val navController = LocalNavController.current
+            TextButton(onClick = {
+                navController.navigate(Screen.LogScreen.route)
+            }) {
                 Text(text = "See all")
             }
         }
