@@ -122,7 +122,7 @@ fun MainNavigation(
                 exitTransition = exitTransition,
                 popExitTransition = popExitTransition,
                 popEnterTransition = popEnterTransition
-            ) { LogScreen(sharedViewModel = addEditLogSharedViewModel) }
+            ) { LogScreen() }
 
             composable(
                 route = Screen.AddEditLogScreen.route,
