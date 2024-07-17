@@ -290,19 +290,22 @@ fun CurrentWeight(uiState: HomeUiState) {
                 )
             }
             Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.Bottom) {
+                val latestWeight = mostRecentLog?.weight?.displayValue ?: NO_DATA_PLACEHOLDER
                 Text(
-                    text = mostRecentLog?.weight?.displayValue ?: NO_DATA_PLACEHOLDER,
+                    text = latestWeight,
                     style = MaterialTheme.typography.displayLarge.copy(
                         fontWeight = FontWeight.SemiBold
                     ),
                     color = MaterialTheme.colorScheme.primary
                 )
-                Text(
-                    text = "kg",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.offset(y = (-8).dp)
-                )
+                if (latestWeight != NO_DATA_PLACEHOLDER) {
+                    Text(
+                        text = "kg",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.offset(y = (-8).dp)
+                    )
+                }
             }
             val difference = uiState.mostRecentDifferenceFromPrevious
             val differenceText =
