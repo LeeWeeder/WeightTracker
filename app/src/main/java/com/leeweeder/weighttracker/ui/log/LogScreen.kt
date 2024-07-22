@@ -73,7 +73,14 @@ internal fun LogScreen(
     ) { paddingValues ->
         LazyColumn(contentPadding = paddingValues) {
             items(logs) { log ->
-                LogItem(dateText = log.date.format("MMM d"), log = log, relativeDateEnabled = false)
+                LogItem(
+                    dateText = log.date.format("MMM d"),
+                    log = log,
+                    relativeDateEnabled = false,
+                    onClick = {
+                        navController.navigate(Screen.AddEditLogScreen.createRoute(logId = log.id))
+                    }
+                )
             }
         }
     }
