@@ -69,6 +69,7 @@ internal fun ThisWeekCard(
         val selectedIndex = remember {
             mutableIntStateOf(SegmentedButtonItems.CHART.ordinal)
         }
+        val navController = LocalNavController.current
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -96,7 +97,6 @@ internal fun ThisWeekCard(
                     color = MaterialTheme.colorScheme.outline
                 )
             }
-            val navController = LocalNavController.current
             TextButton(onClick = {
                 navController.navigate(Screen.LogScreen.route)
             }) {
@@ -151,7 +151,10 @@ internal fun ThisWeekCard(
                                 LogItem(
                                     dateText = log.date.format(
                                         pattern = "EEEE, MMM d"
-                                    ), log = log
+                                    ), log = log,
+                                    onClick = {
+                                        navController.navigate(Screen.AddEditLogScreen.createRoute(logId = log.id))
+                                    }
                                 )
                             }
                         }

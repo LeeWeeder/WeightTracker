@@ -20,7 +20,7 @@ vico = "2.0.0-alpha.23"
 datastore = "1.1.1"
 splashscreen = "1.0.1"
 
-numberSlider = "1.0.3"
+numberslider = "1.0.4"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
@@ -54,7 +54,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 vico = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 
-numberslider = { group = "com.github.LeeWeeder", name = "NumberSlider", version.ref = "numberSlider"}
+numberslider = { group = "com.github.LeeWeeder", name = "NumberSlider", version.ref = "numberslider"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

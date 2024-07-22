@@ -11,7 +11,7 @@ import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.ui.util.relativeDate
 
 @Composable
-internal fun LogItem(dateText: String, log: Log, relativeDateEnabled: Boolean = true) {
+internal fun LogItem(dateText: String, log: Log, relativeDateEnabled: Boolean = true, onClick: () -> Unit) {
     val date = log.date
     ListItem(headlineContent = {
         Text(
@@ -24,7 +24,7 @@ internal fun LogItem(dateText: String, log: Log, relativeDateEnabled: Boolean = 
             text = dateText,
             color = MaterialTheme.colorScheme.outline
         )
-    }, modifier = Modifier.clickable { },
+    }, modifier = Modifier.clickable { onClick() },
         trailingContent = if (relativeDateEnabled && date.relativeDate != null) {
             {
                 Text(
