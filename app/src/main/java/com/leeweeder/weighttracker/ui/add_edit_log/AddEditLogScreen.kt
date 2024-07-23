@@ -34,7 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.numberslider.NumberSlider
 import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.LocalNavController
-import com.leeweeder.weighttracker.ui.components.AlertDialog
+import com.leeweeder.weighttracker.ui.components.InvalidValueAlertDialog
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.util.Weight
 import com.leeweeder.weighttracker.util.toEpochMilli
@@ -102,7 +102,7 @@ internal fun AddEditLogScreen(
         mutableStateOf(false)
     }
 
-    AlertDialog(
+    InvalidValueAlertDialog(
         visible = isAlertDialogVisible.value,
         onDismissRequest = { isAlertDialogVisible.value = false },
         title = "Weight value can't be zero",

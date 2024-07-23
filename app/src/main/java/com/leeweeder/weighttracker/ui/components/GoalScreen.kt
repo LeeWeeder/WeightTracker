@@ -61,7 +61,7 @@ fun GoalScreen(
             keepWholeSelection.value = false
         }
     }
-    AlertDialog(
+    InvalidValueAlertDialog(
         visible = isValidationDialogVisible.value,
         onDismissRequest = { isValidationDialogVisible.value = false },
         title = "Can't set goal",
