@@ -9,4 +9,4 @@ data class Weight(
         get() = value.formatToOneDecimalPlace()
 }
 
-fun Float.toWeight(): Weight = Weight(this)
+fun Number.toWeight(): Weight = Weight(this.toFloat())

@@ -21,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.numberslider.NumberSlider
 import com.leeweeder.weighttracker.R
-import com.leeweeder.weighttracker.ui.AddEditLogSharedViewModel
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.components.AlertDialog
 import com.leeweeder.weighttracker.ui.util.format
@@ -45,16 +43,12 @@ import java.time.LocalDate
 
 @Composable
 fun AddEditLogScreen(
-    viewModel: AddEditLogViewModel = hiltViewModel(),
-    sharedViewModel: AddEditLogSharedViewModel
+    viewModel: AddEditLogViewModel = hiltViewModel()
 ) {
     val addEditLogUiState = viewModel.addEditLogUiState.value
-    val newlyAddedId = viewModel.newlyAddedId.value
     AddEditLogScreen(
         uiState = addEditLogUiState,
-        onEvent = viewModel::onEvent,
-        newlyAddedId = newlyAddedId,
-        onInsertLog = sharedViewModel::addNewLogId
+        onEvent = viewModel::onEvent
     )
 }
 
@@ -62,16 +56,8 @@ fun AddEditLogScreen(
 @Composable
 internal fun AddEditLogScreen(
     uiState: AddEditLogUiState,
-    newlyAddedId: Long?,
     onEvent: (AddEditLogEvent) -> Unit,
-    onInsertLog: (Long) -> Unit
 ) {
-    LaunchedEffect(key1 = newlyAddedId) {
-        if (newlyAddedId != null) {
-            onInsertLog(newlyAddedId)
-        }
-    }
-
     val textFieldValue = remember(uiState.weight) {
         mutableStateOf(uiState.weight.toString())
     }
@@ -158,7 +144,7 @@ internal fun AddEditLogScreen(
                     }) {
                         Text(text = "Save")
                     }
-                    if (uiState.currentLogId != -1) {
+                    if (uiState.currentLogId != DEFAULT_LOG_ID) {
                         Box {
                             var menuExpanded by remember {
                                 mutableStateOf(false)
