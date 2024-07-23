@@ -34,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.numberslider.NumberSlider
 import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.LocalNavController
+import com.leeweeder.weighttracker.ui.components.AlertDialog
 import com.leeweeder.weighttracker.ui.components.InvalidValueAlertDialog
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.util.Weight
@@ -98,15 +99,61 @@ internal fun AddEditLogScreen(
             DatePicker(state = datePickerState)
         }
     }
-    val isAlertDialogVisible = remember {
+    val isInvalidValueAlertDialogVisible = remember {
         mutableStateOf(false)
     }
 
     InvalidValueAlertDialog(
-        visible = isAlertDialogVisible.value,
-        onDismissRequest = { isAlertDialogVisible.value = false },
+        visible = isInvalidValueAlertDialogVisible.value,
+        onDismissRequest = { isInvalidValueAlertDialogVisible.value = false },
         title = "Weight value can't be zero",
         text = "Please enter a value greater than zero."
+    )
+
+    fun saveLog() {
+        val textFieldWeightValue = textFieldValue.value.toFloatOrNull()
+        val newWeight =
+            if (textFieldWeightValue == null || uiState.weight == textFieldWeightValue.toWeight() || textFieldWeightValue == 0f) {
+                uiState.weight
+            } else {
+                textFieldWeightValue.toWeight()
+            }
+
+        if (newWeight == Weight(0f)) {
+            isInvalidValueAlertDialogVisible.value = true
+            return
+        }
+
+        if (newWeight != uiState.weight) {
+            onEvent(AddEditLogEvent.SetWeight(newWeight.value))
+        }
+
+        onEvent(AddEditLogEvent.SaveLog)
+        navController.navigateUp()
+    }
+
+    val isConfirmUpdateDialogVisible = remember {
+        mutableStateOf(false)
+    }
+
+    AlertDialog(
+        visible = isConfirmUpdateDialogVisible.value,
+        onDismissRequest = { isConfirmUpdateDialogVisible.value = false },
+        title = "Continue update?",
+        text = "Are you sure to override the weight for this date (${uiState.date.format("MM/d/yyyy")})? This cannot be undone.",
+        confirmButton = {
+            TextButton(onClick = {
+                saveLog()
+                isConfirmUpdateDialogVisible.value = false
+            }) {
+                Text(text = "Update", color = MaterialTheme.colorScheme.tertiary)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { isConfirmUpdateDialogVisible.value = false }) {
+                Text(text = "Cancel")
+            }
+        }
     )
 
     val focusManager = LocalFocusManager.current
@@ -122,25 +169,8 @@ internal fun AddEditLogScreen(
                 },
                 actions = {
                     TextButton(onClick = {
-                        val textFieldWeightValue = textFieldValue.value.toFloatOrNull()
-                        val newWeight =
-                            if (textFieldWeightValue == null || uiState.weight == textFieldWeightValue.toWeight() || textFieldWeightValue == 0f) {
-                                uiState.weight
-                            } else {
-                                textFieldWeightValue.toWeight()
-                            }
-
-                        if (newWeight == Weight(0f)) {
-                            isAlertDialogVisible.value = true
-                            return@TextButton
-                        }
-
-                        if (newWeight != uiState.weight) {
-                            onEvent(AddEditLogEvent.SetWeight(newWeight.value))
-                        }
-
-                        onEvent(AddEditLogEvent.SaveLog)
-                        navController.navigateUp()
+                        if (uiState.currentLogId == DEFAULT_LOG_ID) saveLog() else isConfirmUpdateDialogVisible.value =
+                            true
                     }) {
                         Text(text = "Save")
                     }

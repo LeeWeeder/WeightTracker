@@ -19,6 +19,11 @@ fun InvalidValueAlertDialog(
         onDismissRequest = onDismissRequest,
         title = title,
         text = text,
+        confirmButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = "Okay")
+            }
+        },
         icon = {
             Icon(painter = painterResource(id = R.drawable.error), contentDescription = null)
         }
@@ -31,16 +36,15 @@ fun AlertDialog(
     onDismissRequest: () -> Unit,
     title: String,
     text: String,
+    confirmButton: @Composable () -> Unit,
+    dismissButton: @Composable (() -> Unit)? = null,
     icon: @Composable (() -> Unit)? = null
 ) {
     if (visible) {
         androidx.compose.material3.AlertDialog(
             onDismissRequest = onDismissRequest,
-            confirmButton = {
-                TextButton(onClick = onDismissRequest) {
-                    Text(text = "Okay")
-                }
-            },
+            confirmButton = confirmButton,
+            dismissButton = dismissButton,
             icon = icon,
             title = {
                 Text(text = title)
