@@ -29,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.IntOffset
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -93,8 +92,6 @@ fun MainNavigation(
         }
 
     CompositionLocalProvider(value = LocalNavController provides navController) {
-        val addEditLogSharedViewModel: AddEditLogSharedViewModel = viewModel()
-
         NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
             composable(
                 route = Screen.HomeScreen.route,
@@ -137,9 +134,7 @@ fun MainNavigation(
                 popExitTransition = popExitTransition,
                 popEnterTransition = popEnterTransition
             ) {
-                AddEditLogScreen(
-                    sharedViewModel = addEditLogSharedViewModel
-                )
+                AddEditLogScreen()
             }
 
             composable(

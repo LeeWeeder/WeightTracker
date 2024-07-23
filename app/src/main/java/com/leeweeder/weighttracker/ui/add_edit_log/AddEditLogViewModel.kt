@@ -12,8 +12,8 @@ import com.leeweeder.weighttracker.util.epochMillisToLocalDate
 import com.leeweeder.weighttracker.util.toWeight
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 const val LOG_ID_KEY = "logId"
@@ -27,12 +27,9 @@ class AddEditLogViewModel @Inject constructor(
     private val _addEditLogUiState = mutableStateOf(AddEditLogUiState())
     val addEditLogUiState: State<AddEditLogUiState> = _addEditLogUiState
 
-    private val _newlyAddedId = mutableStateOf<Long?>(null)
-    val newlyAddedId: State<Long?> = _newlyAddedId
-
     init {
         savedStateHandle.get<Int>(LOG_ID_KEY)?.let { logId ->
-            if (logId != -1) {
+            if (logId != DEFAULT_LOG_ID) {
                 viewModelScope.launch {
                     logUseCases.getLogById(logId).also { log ->
                         _addEditLogUiState.value = addEditLogUiState.value.copy(
@@ -44,12 +41,21 @@ class AddEditLogViewModel @Inject constructor(
                 }
             } else {
                 viewModelScope.launch {
-                    logUseCases.getLatestLogs().firstOrNull()?.let { logs ->
-                        _addEditLogUiState.value = addEditLogUiState.value.copy(
-                            weight = logs.firstOrNull()?.weight
-                                ?: dataStoreUseCases.readGoalWeightState().first().toFloat()
-                                    .toWeight()
-                        )
+                    logUseCases.getLogByDate(LocalDate.now()).also { log ->
+                        if (log != null) {
+                            _addEditLogUiState.value = addEditLogUiState.value.copy(
+                                currentLogId = log.id,
+                                weight = log.weight
+                            )
+                        } else {
+                            logUseCases.getLatestLogs().also { listFlow ->
+                                _addEditLogUiState.value = addEditLogUiState.value.copy(
+                                    weight = listFlow.first().firstOrNull()?.weight
+                                        ?: dataStoreUseCases.readGoalWeightState().first()
+                                            .toWeight()
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -60,8 +66,24 @@ class AddEditLogViewModel @Inject constructor(
         when (event) {
             is AddEditLogEvent.SetDate -> {
                 onEvent(AddEditLogEvent.DatePickerDialogToggleVisibility(show = false))
+                val date = epochMillisToLocalDate(event.millis)
+                viewModelScope.launch {
+                    logUseCases.getLogByDate(date).also { log ->
+                        if (log != null) {
+                            _addEditLogUiState.value = addEditLogUiState.value.copy(
+                                currentLogId = log.id,
+                                weight = log.weight
+                            )
+                        } else {
+                            _addEditLogUiState.value = addEditLogUiState.value.copy(
+                                currentLogId = DEFAULT_LOG_ID
+                            )
+                        }
+                    }
+                }
+
                 _addEditLogUiState.value = addEditLogUiState.value.copy(
-                    date = epochMillisToLocalDate(event.millis)
+                    date = date
                 )
             }
 
@@ -81,10 +103,9 @@ class AddEditLogViewModel @Inject constructor(
                         logUseCases.updateLog(
                             log = log
                         )
-                        _newlyAddedId.value = currentLogId.toLong()
                     } else {
                         val log = Log(weight = currentWeight, date = currentDate)
-                        _newlyAddedId.value = logUseCases.insertLog(
+                        logUseCases.insertLog(
                             log = log
                         )
                     }
