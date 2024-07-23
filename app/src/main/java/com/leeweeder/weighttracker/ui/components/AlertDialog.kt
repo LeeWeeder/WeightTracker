@@ -8,18 +8,44 @@ import androidx.compose.ui.res.painterResource
 import com.leeweeder.weighttracker.R
 
 @Composable
-fun AlertDialog(visible: Boolean, onDismissRequest: () -> Unit, title: String, text: String) {
+fun InvalidValueAlertDialog(
+    visible: Boolean,
+    onDismissRequest: () -> Unit,
+    title: String,
+    text: String
+) {
+    AlertDialog(
+        visible = visible,
+        onDismissRequest = onDismissRequest,
+        title = title,
+        text = text,
+        confirmButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = "Okay")
+            }
+        },
+        icon = {
+            Icon(painter = painterResource(id = R.drawable.error), contentDescription = null)
+        }
+    )
+}
+
+@Composable
+fun AlertDialog(
+    visible: Boolean,
+    onDismissRequest: () -> Unit,
+    title: String,
+    text: String,
+    confirmButton: @Composable () -> Unit,
+    dismissButton: @Composable (() -> Unit)? = null,
+    icon: @Composable (() -> Unit)? = null
+) {
     if (visible) {
         androidx.compose.material3.AlertDialog(
             onDismissRequest = onDismissRequest,
-            confirmButton = {
-                TextButton(onClick = onDismissRequest) {
-                    Text(text = "Okay")
-                }
-            },
-            icon = {
-                Icon(painter = painterResource(id = R.drawable.error), contentDescription = null)
-            },
+            confirmButton = confirmButton,
+            dismissButton = dismissButton,
+            icon = icon,
             title = {
                 Text(text = title)
             },
