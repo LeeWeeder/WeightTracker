@@ -35,8 +35,8 @@ import com.leeweeder.weighttracker.ui.components.LineChart
 import com.leeweeder.weighttracker.ui.components.LogItem
 import com.leeweeder.weighttracker.ui.components.NoData
 import com.leeweeder.weighttracker.ui.components.SectionLabel
+import com.leeweeder.weighttracker.ui.home.currentLogDayOfTheWeek
 import com.leeweeder.weighttracker.ui.home.daysOfWeeksWithValuesKey
-import com.leeweeder.weighttracker.ui.home.mostRecentLogDayOfTheWeekKey
 import com.leeweeder.weighttracker.ui.home.xToDateMapKey
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.ui.util.model.LineChartData
@@ -256,7 +256,7 @@ private fun ThisWeekCardLineChart(
         return remember {
             CartesianValueFormatter { x, chartValues, _ ->
                 val extraStore = chartValues.model.extraStore
-                val (backgroundColor, textColor, borderColor) = if (x == extraStore[mostRecentLogDayOfTheWeekKey])
+                val (backgroundColor, textColor, borderColor) = if (x == extraStore[currentLogDayOfTheWeek])
                     DayOfTheWeekIndicatorProperty(
                         backgroundColor = colorScheme.secondary,
                         textColor = colorScheme.onSecondary,

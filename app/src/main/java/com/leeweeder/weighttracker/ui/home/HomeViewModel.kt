@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 val goalWeightKey = ExtraStore.Key<Float>()
 val daysOfWeeksWithValuesKey = ExtraStore.Key<Set<Float>>()
-val mostRecentLogDayOfTheWeekKey = ExtraStore.Key<Float>()
+val currentLogDayOfTheWeek = ExtraStore.Key<Float>()
 val xToDateMapKey = ExtraStore.Key<Map<Float, LocalDate>>()
 val daysOfTheWeek = ExtraStore.Key<List<LocalDate>>()
 
@@ -34,6 +34,7 @@ class HomeViewModel @Inject constructor(
     val homeUiState: State<HomeUiState> = _homeUiState
 
     private var getLogsForWeekJob: Job? = null
+    private var getLatestLogPairJob: Job? = null
 
     private val _modelProducer = CartesianChartModelProducer()
     val modelProducer
@@ -41,6 +42,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         getLogsForWeek()
+        getLatestLogPair()
         viewModelScope.launch {
             dataStoreUseCases.readGoalWeightState().collectLatest { goalWeight ->
                 _homeUiState.value = homeUiState.value.copy(
@@ -93,10 +95,10 @@ class HomeViewModel @Inject constructor(
                         originalData.map {
                             it.date.toEpochDay().toFloat()
                         }.toSet()
-                    val mostRecentLog = homeUiState.value.mostRecentLog
-                    if (mostRecentLog != null)
-                        extraStore[mostRecentLogDayOfTheWeekKey] =
-                            mostRecentLog.date.toEpochDay().toFloat()
+                    val currentLog = homeUiState.value.latestLogPair.currentLog
+                    if (currentLog != null)
+                        extraStore[currentLogDayOfTheWeek] =
+                            currentLog.date.toEpochDay().toFloat()
                     extraStore[xToDateMapKey] = xToDates
                     extraStore[daysOfTheWeek] = homeUiState.value.daysOfWeek
                 }
@@ -119,5 +121,14 @@ class HomeViewModel @Inject constructor(
                 )
             }
             .launchIn(viewModelScope)
+    }
+
+    private fun getLatestLogPair() {
+        getLatestLogPairJob?.cancel()
+        getLatestLogPairJob = logUseCases.getLatestLogs(2).onEach { logs ->
+            _homeUiState.value = homeUiState.value.copy(
+                latestLogPair = LatestLogPair(logs.firstOrNull(), logs.lastOrNull())
+            )
+        }.launchIn(viewModelScope)
     }
 }
