@@ -59,8 +59,9 @@ internal fun AddEditLogScreen(
     uiState: AddEditLogUiState,
     onEvent: (AddEditLogEvent) -> Unit,
 ) {
-    val textFieldValue = remember(uiState.weight) {
-        mutableStateOf(uiState.weight.toString())
+    val weightState = uiState.weightState
+    val textFieldValue = remember(weightState.potentialWeight) {
+        mutableStateOf(weightState.potentialWeight.displayValue)
     }
 
     val navController = LocalNavController.current
@@ -113,8 +114,8 @@ internal fun AddEditLogScreen(
     fun saveLog() {
         val textFieldWeightValue = textFieldValue.value.toFloatOrNull()
         val newWeight =
-            if (textFieldWeightValue == null || uiState.weight == textFieldWeightValue.toWeight() || textFieldWeightValue == 0f) {
-                uiState.weight
+            if (textFieldWeightValue == null || weightState.potentialWeight == textFieldWeightValue.toWeight() || textFieldWeightValue == 0f) {
+                weightState.potentialWeight
             } else {
                 textFieldWeightValue.toWeight()
             }
@@ -124,7 +125,7 @@ internal fun AddEditLogScreen(
             return
         }
 
-        if (newWeight != uiState.weight) {
+        if (newWeight != weightState.potentialWeight) {
             onEvent(AddEditLogEvent.SetWeight(newWeight.value))
         }
 
@@ -168,10 +169,13 @@ internal fun AddEditLogScreen(
                     )
                 },
                 actions = {
-                    TextButton(onClick = {
-                        if (uiState.currentLogId == DEFAULT_LOG_ID) saveLog() else isConfirmUpdateDialogVisible.value =
-                            true
-                    }) {
+                    TextButton(
+                        onClick = {
+                            if (uiState.currentLogId == DEFAULT_LOG_ID) saveLog() else isConfirmUpdateDialogVisible.value =
+                                true
+                        },
+                        enabled = uiState.currentLogId != DEFAULT_LOG_ID && uiState.hasWeightChange || uiState.currentLogId == DEFAULT_LOG_ID
+                    ) {
                         Text(text = "Save")
                     }
                     if (uiState.currentLogId != DEFAULT_LOG_ID) {
@@ -245,7 +249,7 @@ internal fun AddEditLogScreen(
             ListItem(headlineContent = { Text(text = "Weight", style = labelStyle) })
 
             NumberSlider(
-                value = uiState.weight.value,
+                value = uiState.weightState.potentialWeight.value,
                 onValueChange = {
                     onEvent(AddEditLogEvent.SetWeight(it))
                 },

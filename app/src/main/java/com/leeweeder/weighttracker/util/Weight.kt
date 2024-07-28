@@ -7,6 +7,14 @@ data class Weight(
 ) {
     val displayValue: String
         get() = value.formatToOneDecimalPlace()
+
+    override fun equals(other: Any?): Boolean {
+        return other is Weight && this.value == other.value
+    }
+
+    override fun hashCode(): Int {
+        return value.hashCode()
+    }
 }
 
 fun Number.toWeight(): Weight = Weight(this.toFloat())

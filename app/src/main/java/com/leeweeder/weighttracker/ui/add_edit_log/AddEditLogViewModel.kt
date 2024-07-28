@@ -35,7 +35,7 @@ class AddEditLogViewModel @Inject constructor(
                         _addEditLogUiState.value = addEditLogUiState.value.copy(
                             currentLogId = log.id,
                             date = log.date,
-                            weight = log.weight
+                            weightState = log.weight.toWeightState()
                         )
                     }
                 }
@@ -45,14 +45,14 @@ class AddEditLogViewModel @Inject constructor(
                         if (log != null) {
                             _addEditLogUiState.value = addEditLogUiState.value.copy(
                                 currentLogId = log.id,
-                                weight = log.weight
+                                weightState = log.weight.toWeightState()
                             )
                         } else {
                             logUseCases.getLatestLogs().also { listFlow ->
                                 _addEditLogUiState.value = addEditLogUiState.value.copy(
-                                    weight = listFlow.first().firstOrNull()?.weight
+                                    weightState = (listFlow.first().firstOrNull()?.weight
                                         ?: dataStoreUseCases.readGoalWeightState().first()
-                                            .toWeight()
+                                            .toWeight()).toWeightState()
                                 )
                             }
                         }
@@ -72,7 +72,7 @@ class AddEditLogViewModel @Inject constructor(
                         if (log != null) {
                             _addEditLogUiState.value = addEditLogUiState.value.copy(
                                 currentLogId = log.id,
-                                weight = log.weight
+                                weightState = log.weight.toWeightState()
                             )
                         } else {
                             _addEditLogUiState.value = addEditLogUiState.value.copy(
@@ -83,13 +83,14 @@ class AddEditLogViewModel @Inject constructor(
                 }
 
                 _addEditLogUiState.value = addEditLogUiState.value.copy(
-                    date = date
+                    date = date,
+                    hasWeightChange = false
                 )
             }
 
             AddEditLogEvent.SaveLog -> {
                 val uiState = addEditLogUiState.value
-                val currentWeight = uiState.weight
+                val currentWeight = uiState.weightState.potentialWeight
                 val currentLogId = uiState.currentLogId
                 val currentDate = uiState.date
 
@@ -120,8 +121,11 @@ class AddEditLogViewModel @Inject constructor(
 
             is AddEditLogEvent.SetWeight -> {
                 val uiState = addEditLogUiState.value
+                val weight = event.value.toWeight()
+                val hasWeightChange = uiState.weightState.logWeight != weight
                 _addEditLogUiState.value = uiState.copy(
-                    weight = event.value.toWeight()
+                    hasWeightChange = hasWeightChange,
+                    weightState = uiState.weightState.setPotentialWeight(weight)
                 )
             }
 
