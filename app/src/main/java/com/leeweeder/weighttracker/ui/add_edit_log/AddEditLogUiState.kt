@@ -9,5 +9,6 @@ data class AddEditLogUiState(
     val currentLogId: Int = DEFAULT_LOG_ID,
     val date: LocalDate = LocalDate.now(),
     val datePickerDialogVisible: Boolean = false,
-    val weight: Weight = Weight(0f)
+    val weightState: WeightState = WeightState(Weight(0f)),
+    val hasWeightChange: Boolean = false
 )
