@@ -6,29 +6,23 @@ import java.time.LocalDate
 
 data class HomeUiState(
     val logsForThisWeek: List<Log> = emptyList(),
-    val goalWeight: Int = 0
+    val goalWeight: Int = 0,
+    val latestLogPair: LatestLogPair = LatestLogPair()
 ) {
-    val mostRecentLog: Log?
-        get() = logsForThisWeek.lastOrNull()
-
-    private val previousMostRecentLog: Log?
-        get() {
-            val logsForThisWeekSize = logsForThisWeek.size
-            return if (logsForThisWeekSize > 1) logsForThisWeek[logsForThisWeekSize - 2] else null
-        }
-
-    val mostRecentDifferenceFromPrevious: Float?
-        get() = previousMostRecentLog?.weight?.value?.let {
-            mostRecentLog?.weight?.value
-                ?.minus(it)
-        }
-
-    val mostRecentDifferenceFromGoal: Float?
-        get() = mostRecentLog?.weight?.value?.let {
+    val currentWeightDifferenceFromGoal: Float?
+        get() = this.latestLogPair.currentLog?.weight?.value?.let {
             goalWeight.minus(it)
         }
 
     val today: LocalDate = LocalDate.now()
 
     val daysOfWeek = today.daysOfWeek
+}
+
+data class LatestLogPair(val currentLog: Log? = null, val previousLog: Log? = null) {
+    val difference: Float?
+        get() = previousLog?.weight?.value?.let {
+            currentLog?.weight?.value
+                ?.minus(it)
+        }
 }

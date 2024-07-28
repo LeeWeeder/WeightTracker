@@ -162,7 +162,7 @@ private fun HomeScreenContent(
             )
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)) {
-                    val differenceFromGoal = uiState.mostRecentDifferenceFromGoal
+                    val differenceFromGoal = uiState.currentWeightDifferenceFromGoal
                     Column(
                         modifier = Modifier
                             .padding(14.dp)
@@ -263,7 +263,7 @@ fun WeightTrackerTopAppBar() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrentWeight(uiState: HomeUiState) {
-    val mostRecentLog = uiState.mostRecentLog
+    val latestLogPair = uiState.latestLogPair
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -284,13 +284,13 @@ fun CurrentWeight(uiState: HomeUiState) {
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Text(
-                    text = mostRecentLog?.date?.format("EEE, MMM d, yyyy", true) ?: NO_DATA_PLACEHOLDER,
+                    text = latestLogPair.currentLog?.date?.format("EEE, MMM d, yyyy", true) ?: NO_DATA_PLACEHOLDER,
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
             Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.Bottom) {
-                val latestWeight = mostRecentLog?.weight?.displayValue ?: NO_DATA_PLACEHOLDER
+                val latestWeight = latestLogPair.currentLog?.weight?.displayValue ?: NO_DATA_PLACEHOLDER
                 Text(
                     text = latestWeight,
                     style = MaterialTheme.typography.displayLarge.copy(
@@ -307,7 +307,7 @@ fun CurrentWeight(uiState: HomeUiState) {
                     )
                 }
             }
-            val difference = uiState.mostRecentDifferenceFromPrevious
+            val difference = latestLogPair.difference
             val differenceText =
                 difference?.let {
                     it.formatToOneDecimalPlace(showPlusSign = true) + " kg"
