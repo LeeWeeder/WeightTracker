@@ -54,6 +54,7 @@ import com.leeweeder.weighttracker.ui.util.model.WeekRange
 import com.leeweeder.weighttracker.util.Screen
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import kotlin.math.absoluteValue
 
 @Composable
@@ -283,8 +284,10 @@ fun CurrentWeight(uiState: HomeUiState) {
                     .padding(bottom = 2.dp),
                 contentAlignment = Alignment.BottomCenter
             ) {
+                val baseDatePattern = "EEE, MMM d"
+                val datePattern = if (LocalDate.now().year == latestLogPair.currentLog?.date?.year) baseDatePattern else "$baseDatePattern, yyyy"
                 Text(
-                    text = latestLogPair.currentLog?.date?.format("EEE, MMM d, yyyy", true) ?: NO_DATA_PLACEHOLDER,
+                    text = latestLogPair.currentLog?.date?.format(datePattern, true) ?: NO_DATA_PLACEHOLDER,
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
