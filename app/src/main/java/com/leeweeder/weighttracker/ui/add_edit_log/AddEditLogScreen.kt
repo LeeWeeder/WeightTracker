@@ -71,7 +71,7 @@ internal fun AddEditLogScreen(
                 initialSelectedDateMillis = uiState.date.toEpochMilli(),
                 selectableDates = object : SelectableDates {
                     override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                        return utcTimeMillis <= System.currentTimeMillis()
+                        return utcTimeMillis <= LocalDate.now().toEpochMilli()
                     }
                 })
 
