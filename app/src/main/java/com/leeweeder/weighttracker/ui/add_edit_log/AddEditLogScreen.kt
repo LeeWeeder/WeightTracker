@@ -36,7 +36,9 @@ import com.leeweeder.numberslider.NumberSlider
 import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.components.AlertDialog
+import com.leeweeder.weighttracker.ui.components.ConfirmDeleteLogAlertDialog
 import com.leeweeder.weighttracker.ui.components.InvalidValueAlertDialog
+import com.leeweeder.weighttracker.ui.components.rememberConfirmDeleteLogAlertDialogState
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.util.Weight
 import com.leeweeder.weighttracker.util.toEpochMilli
@@ -158,6 +160,15 @@ internal fun AddEditLogScreen(
         }
     )
 
+    val confirmDeleteLogAlertDialogState = rememberConfirmDeleteLogAlertDialogState()
+    ConfirmDeleteLogAlertDialog(
+        state = confirmDeleteLogAlertDialogState,
+        onDismissRequest = { confirmDeleteLogAlertDialogState.dismiss() },
+        onConfirm = {
+            // TODO: Implement deletion
+        }
+    )
+
     val focusManager = LocalFocusManager.current
 
     Scaffold(
@@ -198,9 +209,9 @@ internal fun AddEditLogScreen(
                                 DropdownMenuItem(text = {
                                     Text(text = "Delete")
                                 }, onClick = {
-                                    onEvent(AddEditLogEvent.DeleteLog)
                                     menuExpanded = false
-                                    navController.popBackStack()
+                                    confirmDeleteLogAlertDialogState.date = uiState.date
+                                    confirmDeleteLogAlertDialogState.show()
                                 })
                             }
                         }

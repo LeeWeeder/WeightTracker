@@ -29,7 +29,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.LocalNavController
+import com.leeweeder.weighttracker.ui.components.ConfirmDeleteLogAlertDialog
 import com.leeweeder.weighttracker.ui.components.LogItem
+import com.leeweeder.weighttracker.ui.components.rememberConfirmDeleteLogAlertDialogState
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.util.Screen
 
@@ -52,6 +54,16 @@ internal fun LogScreen(
 ) {
     val navController = LocalNavController.current
     val logs = uiState.logs
+
+    val confirmDeleteLogAlertDialogState = rememberConfirmDeleteLogAlertDialogState()
+    ConfirmDeleteLogAlertDialog(
+        state = confirmDeleteLogAlertDialogState,
+        onDismissRequest = { confirmDeleteLogAlertDialogState.dismiss() },
+        onConfirm = {
+            // TODO: Implement deletion
+        }
+    )
+
     Scaffold(
         floatingActionButton = {
             ExtendedFloatingActionButton(
@@ -79,6 +91,10 @@ internal fun LogScreen(
                     relativeDateEnabled = false,
                     onClick = {
                         navController.navigate(Screen.AddEditLogScreen.createRoute(logId = log.id))
+                    },
+                    onLongClick = {
+                        confirmDeleteLogAlertDialogState.date = log.date
+                        confirmDeleteLogAlertDialogState.show()
                     }
                 )
             }

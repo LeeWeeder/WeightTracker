@@ -45,6 +45,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.MainActivityViewModel
+import com.leeweeder.weighttracker.ui.components.ConfirmDeleteLogAlertDialog
+import com.leeweeder.weighttracker.ui.components.rememberConfirmDeleteLogAlertDialogState
 import com.leeweeder.weighttracker.ui.home.components.GoalScreenDialog
 import com.leeweeder.weighttracker.ui.home.components.ThisWeekCard
 import com.leeweeder.weighttracker.ui.util.format
@@ -117,23 +119,37 @@ fun HomeScreen(
         }) { weight ->
         onWeightGoalSet(weight)
     }
+
+    val confirmDeleteLogAlertDialogState = rememberConfirmDeleteLogAlertDialogState()
+    ConfirmDeleteLogAlertDialog(
+        state = confirmDeleteLogAlertDialogState,
+        onDismissRequest = { confirmDeleteLogAlertDialogState.dismiss() },
+        onConfirm = {
+            // TODO: Implement deletion
+        }
+    )
+
     Scaffold(
         floatingActionButton = {
             AddWeightRecordFab(onClick = { navController.navigate(Screen.AddEditLogScreen.route) })
         },
         topBar = { WeightTrackerTopAppBar() }
-    ) {
+    ) { paddingValues ->
         HomeScreenContent(
             uiState = uiState,
             paddingValues = PaddingValues(
-                top = it.calculateTopPadding(),
-                bottom = it.calculateBottomPadding()
+                top = paddingValues.calculateTopPadding(),
+                bottom = paddingValues.calculateBottomPadding()
             ),
             showGoalScreen = {
                 goalScreenDialogVisible.value = true
             },
             observeThisWeekLogsAndGoalWeight = observeThisWeekLogsAndGoalWeight,
-            modelProducer = modelProducer
+            modelProducer = modelProducer,
+            onLogItemLongClick = { logDate ->
+                confirmDeleteLogAlertDialogState.date = logDate
+                confirmDeleteLogAlertDialogState.show()
+            }
         )
     }
 }
@@ -143,6 +159,7 @@ private fun HomeScreenContent(
     uiState: HomeUiState,
     paddingValues: PaddingValues,
     showGoalScreen: () -> Unit,
+    onLogItemLongClick: (LocalDate) -> Unit,
     observeThisWeekLogsAndGoalWeight: () -> Unit,
     modelProducer: CartesianChartModelProducer
 ) {
@@ -234,7 +251,8 @@ private fun HomeScreenContent(
                 modelProducer = modelProducer,
                 dataObserver = observeThisWeekLogsAndGoalWeight
             ),
-            logs = uiState.logsForThisWeek
+            logs = uiState.logsForThisWeek,
+            onLogItemLongClick = onLogItemLongClick
         )
     }
 }
@@ -285,15 +303,18 @@ fun CurrentWeight(uiState: HomeUiState) {
                 contentAlignment = Alignment.BottomCenter
             ) {
                 val baseDatePattern = "EEE, MMM d"
-                val datePattern = if (LocalDate.now().year == latestLogPair.currentLog?.date?.year) baseDatePattern else "$baseDatePattern, yyyy"
+                val datePattern =
+                    if (LocalDate.now().year == latestLogPair.currentLog?.date?.year) baseDatePattern else "$baseDatePattern, yyyy"
                 Text(
-                    text = latestLogPair.currentLog?.date?.format(datePattern, true) ?: NO_DATA_PLACEHOLDER,
+                    text = latestLogPair.currentLog?.date?.format(datePattern, true)
+                        ?: NO_DATA_PLACEHOLDER,
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
             Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.Bottom) {
-                val latestWeight = latestLogPair.currentLog?.weight?.displayValue ?: NO_DATA_PLACEHOLDER
+                val latestWeight =
+                    latestLogPair.currentLog?.weight?.displayValue ?: NO_DATA_PLACEHOLDER
                 Text(
                     text = latestWeight,
                     style = MaterialTheme.typography.displayLarge.copy(

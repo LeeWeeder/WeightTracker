@@ -59,7 +59,8 @@ import java.time.LocalDate
 internal fun ThisWeekCard(
     weekRange: WeekRange,
     lineChartData: LineChartData,
-    logs: List<Log>
+    logs: List<Log>,
+    onLogItemLongClick: (date: LocalDate) -> Unit
 ) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
@@ -154,6 +155,9 @@ internal fun ThisWeekCard(
                                     ), log = log,
                                     onClick = {
                                         navController.navigate(Screen.AddEditLogScreen.createRoute(logId = log.id))
+                                    },
+                                    onLongClick = {
+                                        onLogItemLongClick(log.date)
                                     }
                                 )
                             }
