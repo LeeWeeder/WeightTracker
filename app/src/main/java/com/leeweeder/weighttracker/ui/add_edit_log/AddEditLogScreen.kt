@@ -1,5 +1,6 @@
 package com.leeweeder.weighttracker.ui.add_edit_log
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -178,7 +179,7 @@ internal fun AddEditLogScreen(
                     ) {
                         Text(text = "Save")
                     }
-                    if (uiState.currentLogId != DEFAULT_LOG_ID) {
+                    AnimatedVisibility(uiState.currentLogId != DEFAULT_LOG_ID) {
                         Box {
                             var menuExpanded by remember {
                                 mutableStateOf(false)
