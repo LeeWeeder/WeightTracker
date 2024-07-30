@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.weighttracker.R
+import com.leeweeder.weighttracker.domain.model.toDeleteLogRequest
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.components.ConfirmDeleteLogAlertDialog
 import com.leeweeder.weighttracker.ui.components.LogItem
@@ -59,8 +60,8 @@ internal fun LogScreen(
     ConfirmDeleteLogAlertDialog(
         state = confirmDeleteLogAlertDialogState,
         onDismissRequest = { confirmDeleteLogAlertDialogState.dismiss() },
-        onConfirm = {
-            // TODO: Implement deletion
+        onConfirm = { deleteLogRequest ->
+            deleteLogRequest?.let { onEvent(LogEvent.DeleteLog(it.id)) }
         }
     )
 
@@ -93,8 +94,7 @@ internal fun LogScreen(
                         navController.navigate(Screen.AddEditLogScreen.createRoute(logId = log.id))
                     },
                     onLongClick = {
-                        confirmDeleteLogAlertDialogState.date = log.date
-                        confirmDeleteLogAlertDialogState.show()
+                        confirmDeleteLogAlertDialogState.show(log.toDeleteLogRequest())
                     }
                 )
             }

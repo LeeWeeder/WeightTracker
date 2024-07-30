@@ -43,6 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.leeweeder.weighttracker.R
+import com.leeweeder.weighttracker.domain.model.Log
+import com.leeweeder.weighttracker.domain.model.toDeleteLogRequest
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.MainActivityViewModel
 import com.leeweeder.weighttracker.ui.components.ConfirmDeleteLogAlertDialog
@@ -70,13 +72,15 @@ fun HomeScreen(
     val setGoalWeight = homeViewModel::setGoalWeight
     val observeThisWeekLogsAndGoalWeight = homeViewModel::observeThisWeekLogsAndGoalWeight
     val modelProducer = homeViewModel.modelProducer
+    val onEvent = homeViewModel::onEvent
 
     val homeScreen = @Composable {
         HomeScreen(
             uiState = uiState,
             onWeightGoalSet = setGoalWeight,
             observeThisWeekLogsAndGoalWeight = observeThisWeekLogsAndGoalWeight,
-            modelProducer = modelProducer
+            modelProducer = modelProducer,
+            onEvent = onEvent
         )
     }
 
@@ -105,6 +109,7 @@ fun HomeScreen(
     uiState: HomeUiState,
     onWeightGoalSet: (weight: Int) -> Unit,
     observeThisWeekLogsAndGoalWeight: () -> Unit,
+    onEvent: (HomeEvent) -> Unit,
     modelProducer: CartesianChartModelProducer
 ) {
     val goalScreenDialogVisible = remember {
@@ -116,7 +121,8 @@ fun HomeScreen(
         initialValue = uiState.goalWeight,
         onDismissRequest = {
             goalScreenDialogVisible.value = false
-        }) { weight ->
+        }
+    ) { weight ->
         onWeightGoalSet(weight)
     }
 
@@ -124,8 +130,8 @@ fun HomeScreen(
     ConfirmDeleteLogAlertDialog(
         state = confirmDeleteLogAlertDialogState,
         onDismissRequest = { confirmDeleteLogAlertDialogState.dismiss() },
-        onConfirm = {
-            // TODO: Implement deletion
+        onConfirm = { log ->
+            log?.let { onEvent(HomeEvent.DeleteLog(it.id)) }
         }
     )
 
@@ -146,9 +152,8 @@ fun HomeScreen(
             },
             observeThisWeekLogsAndGoalWeight = observeThisWeekLogsAndGoalWeight,
             modelProducer = modelProducer,
-            onLogItemLongClick = { logDate ->
-                confirmDeleteLogAlertDialogState.date = logDate
-                confirmDeleteLogAlertDialogState.show()
+            onLogItemLongClick = { log ->
+                confirmDeleteLogAlertDialogState.show(log.toDeleteLogRequest())
             }
         )
     }
@@ -159,7 +164,7 @@ private fun HomeScreenContent(
     uiState: HomeUiState,
     paddingValues: PaddingValues,
     showGoalScreen: () -> Unit,
-    onLogItemLongClick: (LocalDate) -> Unit,
+    onLogItemLongClick: (Log) -> Unit,
     observeThisWeekLogsAndGoalWeight: () -> Unit,
     modelProducer: CartesianChartModelProducer
 ) {
