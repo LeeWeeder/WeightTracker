@@ -6,16 +6,20 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.ui.home.daysOfTheWeek
 import com.leeweeder.weighttracker.ui.home.goalWeightKey
 import com.leeweeder.weighttracker.ui.util.format
@@ -31,12 +35,10 @@ import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
 import com.patrykandpatrick.vico.compose.common.component.fixed
-import com.patrykandpatrick.vico.compose.common.component.rememberLayeredComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.of
-import com.patrykandpatrick.vico.compose.common.shader.color
 import com.patrykandpatrick.vico.compose.common.shape.dashed
 import com.patrykandpatrick.vico.compose.common.shape.markerCornered
 import com.patrykandpatrick.vico.core.cartesian.CartesianChart
@@ -57,13 +59,18 @@ import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarkerValueForma
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.cartesian.marker.LineCartesianLayerMarkerTarget
 import com.patrykandpatrick.vico.core.common.Dimensions
+import com.patrykandpatrick.vico.core.common.Fill
 import com.patrykandpatrick.vico.core.common.HorizontalPosition
+import com.patrykandpatrick.vico.core.common.LayeredComponent
 import com.patrykandpatrick.vico.core.common.VerticalPosition
+import com.patrykandpatrick.vico.core.common.component.Shadow
+import com.patrykandpatrick.vico.core.common.component.ShapeComponent
 import com.patrykandpatrick.vico.core.common.component.TextComponent
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
-import com.patrykandpatrick.vico.core.common.shader.DynamicShader
 import com.patrykandpatrick.vico.core.common.shape.Corner
 import com.patrykandpatrick.vico.core.common.shape.Shape
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import java.text.DecimalFormat
 import java.time.LocalDate
 import kotlin.math.roundToInt
@@ -71,24 +78,32 @@ import kotlin.math.roundToInt
 @Composable
 fun LineChart(
     modelProducer: CartesianChartModelProducer,
-    dataObserver: () -> Unit,
+    dataObserver: () -> Flow<List<Log>>,
     modifier: Modifier = Modifier,
     bottomAxis: HorizontalAxis<AxisPosition.Horizontal.Bottom> = rememberBottomAxis()
 ) {
-    LaunchedEffect(Unit) {
-        dataObserver()
+    val showPlaceholder = remember {
+        mutableStateOf(false)
     }
-
-    CartesianChartHost(
-        chart = rememberLineChart(bottomAxis = bottomAxis),
-        modelProducer = modelProducer,
-        modifier = modifier,
-        zoomState = rememberVicoZoomState(zoomEnabled = false),
-        placeholder = {
-            NoData(modifier = Modifier.fillMaxSize())
-        },
-        scrollState = rememberVicoScrollState(scrollEnabled = false)
-    )
+    LaunchedEffect(Unit) {
+        dataObserver().collectLatest { showPlaceholder.value = it.isEmpty() }
+    }
+    Box(modifier = modifier) {
+        if (!showPlaceholder.value) {
+            CartesianChartHost(
+                chart = rememberLineChart(bottomAxis = bottomAxis),
+                modelProducer = modelProducer,
+                zoomState = rememberVicoZoomState(zoomEnabled = false),
+                scrollState = rememberVicoScrollState(scrollEnabled = false)
+            )
+        } else {
+            NoData(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
+        }
+    }
 }
 
 @Composable
@@ -98,9 +113,9 @@ private fun rememberLineChart(
     val primaryColor = MaterialTheme.colorScheme.primary
 
     val weightLine = rememberLine(
-        shader = DynamicShader.color(primaryColor),
+        fill = LineCartesianLayer.LineFill.single(Fill(primaryColor.toArgb())),
         thickness = 3.dp,
-        backgroundShader = null,
+        areaFill = null,
         pointProvider = LineCartesianLayer.PointProvider.single(
             rememberPoint(
                 component = rememberShapeComponent(
@@ -159,32 +174,32 @@ private fun rememberLineChart(
 
 private fun AxisValueOverrider.Companion.weightTrackerValueOverrider(): AxisValueOverrider {
     return object : AxisValueOverrider {
-        override fun getMinY(minY: Float, maxY: Float, extraStore: ExtraStore): Float {
+        override fun getMinY(minY: Double, maxY: Double, extraStore: ExtraStore): Double {
             val goalWeight = extraStore[goalWeightKey]
             val newMinY = minOf(minY, goalWeight)
             val newMaxY = maxOf(maxY, goalWeight)
             val rangeTenPercent = (newMaxY - newMinY) * 0.1f
-            val threshold = if (rangeTenPercent.roundToInt() == 0) 2f else rangeTenPercent
+            val threshold = if (rangeTenPercent.roundToInt() == 0) 2.0 else rangeTenPercent
             return if (newMinY - threshold.roundToInt()
                     .toFloat() <= 0
-            ) 0f else newMinY - threshold.roundToInt().toFloat()
+            ) 0.0 else newMinY - threshold.roundToInt().toFloat()
         }
 
-        override fun getMaxY(minY: Float, maxY: Float, extraStore: ExtraStore): Float {
+        override fun getMaxY(minY: Double, maxY: Double, extraStore: ExtraStore): Double {
             val goalWeight = extraStore[goalWeightKey]
             val newMaxY = maxOf(maxY, goalWeight)
             val newMinY = minOf(minY, goalWeight)
             val rangeTenPercent = (newMaxY - newMinY) * 0.1f
-            val threshold = if (rangeTenPercent.roundToInt() == 0) 1f else rangeTenPercent
+            val threshold = if (rangeTenPercent.roundToInt() == 0) 1.0 else rangeTenPercent
             return (newMaxY + threshold.roundToInt().toFloat())
         }
 
-        override fun getMinX(minX: Float, maxX: Float, extraStore: ExtraStore): Float {
-            return extraStore[daysOfTheWeek].minOf { it.toEpochDay().toFloat() }
+        override fun getMinX(minX: Double, maxX: Double, extraStore: ExtraStore): Double {
+            return extraStore[daysOfTheWeek].minOf { it.toEpochDay().toDouble() }
         }
 
-        override fun getMaxX(minX: Float, maxX: Float, extraStore: ExtraStore): Float {
-            return extraStore[daysOfTheWeek].maxOf { it.toEpochDay().toFloat() }
+        override fun getMaxX(minX: Double, maxX: Double, extraStore: ExtraStore): Double {
+            return extraStore[daysOfTheWeek].maxOf { it.toEpochDay().toDouble() }
         }
     }
 }
@@ -193,7 +208,7 @@ private class WeightTrackerMarkerValueFormatter(
     private val color: Int
 ) : CartesianMarkerValueFormatter {
     // There is only one chart. Edit as further feature is needed
-    private fun SpannableStringBuilder.append(y: Float, color: Int) {
+    private fun SpannableStringBuilder.append(y: Double, color: Int) {
         val decimalFormat = DecimalFormat("#.##;−#.##")
         appendCompat(
             decimalFormat.format(y) + " kg",
@@ -235,11 +250,11 @@ private fun rememberMarker(): CartesianMarker {
     val bgColor = Color(context.getColor(android.R.color.system_neutral1_10))
     val color = Color(context.getColor(android.R.color.system_accent1_400))
     val labelBackground =
-        rememberShapeComponent(bgColor, labelBackgroundShape)
-            .setShadow(
-                radius = LABEL_BACKGROUND_SHADOW_RADIUS_DP,
-                dy = LABEL_BACKGROUND_SHADOW_DY_DP
+        rememberShapeComponent(
+            bgColor, labelBackgroundShape, shadow = Shadow(
+                LABEL_BACKGROUND_SHADOW_RADIUS_DP, dyDp = LABEL_BACKGROUND_SHADOW_DY_DP
             )
+        )
     val label =
         rememberTextComponent(
             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
@@ -248,21 +263,7 @@ private fun rememberMarker(): CartesianMarker {
             textAlignment = Layout.Alignment.ALIGN_CENTER,
             minWidth = TextComponent.MinWidth.fixed(40.dp),
         )
-    val indicatorFrontComponent =
-        rememberShapeComponent(bgColor, Shape.Pill)
-    val indicatorCenterComponent = rememberShapeComponent(shape = Shape.Pill)
-    val indicatorRearComponent = rememberShapeComponent(shape = Shape.Pill)
-    val indicator =
-        rememberLayeredComponent(
-            rear = indicatorRearComponent,
-            front =
-            rememberLayeredComponent(
-                rear = indicatorCenterComponent,
-                front = indicatorFrontComponent,
-                padding = Dimensions.of(2.dp),
-            ),
-            padding = Dimensions.of(6.dp),
-        )
+    rememberShapeComponent(bgColor, Shape.Pill)
     val guideline = rememberAxisGuidelineComponent(
         thickness = 2.dp,
         color = MaterialTheme.colorScheme.outlineVariant
@@ -271,17 +272,30 @@ private fun rememberMarker(): CartesianMarker {
     val valueFormatter = remember {
         WeightTrackerMarkerValueFormatter(primaryColor)
     }
-    return remember(label, indicator, guideline) {
+    return remember(label, guideline) {
         object :
             DefaultCartesianMarker(
                 label = label,
-                indicator = indicator,
-                indicatorSizeDp = 24f,
-                setIndicatorColor = { color ->
-                    indicatorRearComponent.color = Color(color).copy(alpha = 0.15f).toArgb()
-                    indicatorCenterComponent.color = color
-                    indicatorCenterComponent.setShadow(radius = 8f, color = color)
+                indicator = { color ->
+                    LayeredComponent(
+                        rear = ShapeComponent(
+                            color = Color(color).copy(alpha = 0.15f).toArgb(),
+                            Shape.Pill
+                        ),
+                        front =
+                        LayeredComponent(
+                            rear = ShapeComponent(
+                                color = color,
+                                Shape.Pill,
+                                shadow = Shadow(radiusDp = 8f, color = color)
+                            ),
+                            front = ShapeComponent(color = bgColor.toArgb(), Shape.Pill),
+                            padding = Dimensions.of(2.dp),
+                        ),
+                        padding = Dimensions.of(6.dp),
+                    )
                 },
+                indicatorSizeDp = 24f,
                 guideline = guideline,
                 valueFormatter = valueFormatter
             ) {

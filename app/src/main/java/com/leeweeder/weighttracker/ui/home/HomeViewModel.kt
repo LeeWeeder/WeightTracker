@@ -1,5 +1,6 @@
 package com.leeweeder.weighttracker.ui.home
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
@@ -12,17 +13,19 @@ import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
-val goalWeightKey = ExtraStore.Key<Float>()
-val daysOfWeeksWithValuesKey = ExtraStore.Key<Set<Float>>()
-val currentLogDayOfTheWeek = ExtraStore.Key<Float>()
-val xToDateMapKey = ExtraStore.Key<Map<Float, LocalDate>>()
+val goalWeightKey = ExtraStore.Key<Double>()
+val daysOfWeeksWithValuesKey = ExtraStore.Key<Set<Double>>()
+val currentLogDayOfTheWeek = ExtraStore.Key<Double>()
+val xToDateMapKey = ExtraStore.Key<Map<Double, LocalDate>>()
 val daysOfTheWeek = ExtraStore.Key<List<LocalDate>>()
 
 @HiltViewModel
@@ -36,7 +39,7 @@ class HomeViewModel @Inject constructor(
     private var getLogsForWeekJob: Job? = null
     private var getLatestLogPairJob: Job? = null
 
-    private val _modelProducer = CartesianChartModelProducer()
+    private var _modelProducer = CartesianChartModelProducer()
     val modelProducer
         get() = _modelProducer
 
@@ -62,23 +65,29 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun observeThisWeekLogsAndGoalWeight() {
+    fun observeThisWeekLogsAndGoalWeight(): Flow<List<com.leeweeder.weighttracker.domain.model.Log>> {
+        var flow = emptyFlow<List<com.leeweeder.weighttracker.domain.model.Log>>()
         viewModelScope.launch {
             snapshotFlow {
                 homeUiState.value.logsForThisWeek
             }
-                .onEach { loadLineChart() }
+                .onEach {
+                    loadLineChart()
+                }
+                .also {
+                    flow = it
+                }
                 .launchIn(viewModelScope)
 
             snapshotFlow { homeUiState.value.goalWeight }
                 .onEach { loadLineChart() }
                 .launchIn(viewModelScope)
         }
+        return flow
     }
 
     private fun loadLineChart() {
-        val originalData =
-            homeUiState.value.logsForThisWeek.also { if (it.isEmpty()) return }
+        val originalData = homeUiState.value.logsForThisWeek.apply { if (isEmpty()) return }
 
         viewModelScope.launch {
             val precedingDay =
@@ -90,25 +99,26 @@ class HomeViewModel @Inject constructor(
                 if (precedingDay != null) it[precedingDay.date] = precedingDay.weight.value
             }.toSortedMap().toMap()
 
-            val xToDates = data.keys.associateBy { it.toEpochDay().toFloat() }
+            val xToDates = data.keys.associateBy { it.toEpochDay().toDouble() }
 
-            modelProducer.runTransaction {
+            _modelProducer.runTransaction {
                 lineSeries {
                     series(
                         x = xToDates.keys,
                         y = data.values
                     )
                 }
+                Log.d("logsForThisWeek", "$data")
                 extras { extraStore ->
-                    extraStore[goalWeightKey] = homeUiState.value.goalWeight.toFloat()
+                    extraStore[goalWeightKey] = homeUiState.value.goalWeight.toDouble()
                     extraStore[daysOfWeeksWithValuesKey] =
                         originalData.map {
-                            it.date.toEpochDay().toFloat()
+                            it.date.toEpochDay().toDouble()
                         }.toSet()
                     val currentLog = homeUiState.value.latestLogPair.currentLog
                     if (currentLog != null)
                         extraStore[currentLogDayOfTheWeek] =
-                            currentLog.date.toEpochDay().toFloat()
+                            currentLog.date.toEpochDay().toDouble()
                     extraStore[xToDateMapKey] = xToDates
                     extraStore[daysOfTheWeek] = homeUiState.value.daysOfWeek
                 }
