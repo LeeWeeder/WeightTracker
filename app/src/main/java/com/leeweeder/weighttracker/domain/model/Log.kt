@@ -19,6 +19,7 @@ package com.leeweeder.weighttracker.domain.model
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.leeweeder.weighttracker.ui.components.DeleteLogRequest
 import com.leeweeder.weighttracker.util.Weight
 import java.time.LocalDate
 
@@ -29,3 +30,5 @@ data class Log(
     val weight: Weight,
     val date: LocalDate
 )
+
+fun Log.toDeleteLogRequest(): DeleteLogRequest = DeleteLogRequest(this.id, this.date)

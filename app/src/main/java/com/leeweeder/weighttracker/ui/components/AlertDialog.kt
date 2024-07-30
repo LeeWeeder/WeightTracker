@@ -56,13 +56,15 @@ class ConfirmDeleteLogAlertDialogState {
     var visible by mutableStateOf(false)
         private set
 
-    var date by mutableStateOf<LocalDate?>(null)
+    var logToDelete by mutableStateOf<DeleteLogRequest?>(null)
+        private set
 
     fun dismiss() {
         visible = false
     }
 
-    fun show() {
+    fun show(logToDelete: DeleteLogRequest) {
+        this.logToDelete = logToDelete
         visible = true
     }
 
@@ -71,28 +73,30 @@ class ConfirmDeleteLogAlertDialogState {
             save = {
                 listOf(
                     it.visible,
-                    it.date
+                    it.logToDelete
                 )
             },
             restore = {
                 ConfirmDeleteLogAlertDialogState().apply {
                     visible = it[0] as Boolean
-                    date = it[1] as LocalDate?
+                    logToDelete = it[1] as DeleteLogRequest?
                 }
             }
         )
     }
 }
 
+data class DeleteLogRequest(val id: Int, val date: LocalDate?)
+
 @Composable
 fun ConfirmDeleteLogAlertDialog(
     state: ConfirmDeleteLogAlertDialogState,
     onDismissRequest: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: (DeleteLogRequest?) -> Unit
 ) {
     val builder = AnnotatedString.Builder()
     builder.append("Are you sure you want to delete log for ")
-    val date = state.date?.format("MM/d/yyyy") ?: "-"
+    val date = state.logToDelete?.date?.format("MM/d/yyyy") ?: "-"
     builder.withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
         append(date)
     }
@@ -108,7 +112,7 @@ fun ConfirmDeleteLogAlertDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    onConfirm()
+                    onConfirm(state.logToDelete)
                     onDismissRequest()
                 },
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)

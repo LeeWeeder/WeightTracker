@@ -37,6 +37,7 @@ import com.leeweeder.weighttracker.R
 import com.leeweeder.weighttracker.ui.LocalNavController
 import com.leeweeder.weighttracker.ui.components.AlertDialog
 import com.leeweeder.weighttracker.ui.components.ConfirmDeleteLogAlertDialog
+import com.leeweeder.weighttracker.ui.components.DeleteLogRequest
 import com.leeweeder.weighttracker.ui.components.InvalidValueAlertDialog
 import com.leeweeder.weighttracker.ui.components.rememberConfirmDeleteLogAlertDialogState
 import com.leeweeder.weighttracker.ui.util.format
@@ -165,7 +166,8 @@ internal fun AddEditLogScreen(
         state = confirmDeleteLogAlertDialogState,
         onDismissRequest = { confirmDeleteLogAlertDialogState.dismiss() },
         onConfirm = {
-            // TODO: Implement deletion
+            onEvent(AddEditLogEvent.DeleteLog)
+            navController.navigateUp()
         }
     )
 
@@ -210,8 +212,7 @@ internal fun AddEditLogScreen(
                                     Text(text = "Delete")
                                 }, onClick = {
                                     menuExpanded = false
-                                    confirmDeleteLogAlertDialogState.date = uiState.date
-                                    confirmDeleteLogAlertDialogState.show()
+                                    confirmDeleteLogAlertDialogState.show(DeleteLogRequest(id = uiState.currentLogId, date = uiState.date))
                                 })
                             }
                         }

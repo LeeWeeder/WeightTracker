@@ -16,11 +16,11 @@
 
 package com.leeweeder.weighttracker.ui.log
 
-import com.leeweeder.weighttracker.domain.usecases.LogUseCases
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.leeweeder.weighttracker.domain.usecases.LogUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -60,6 +60,12 @@ class LogViewModel @Inject constructor(
                     } catch (e: Exception) {
                         _eventFlow.emit(UiEvent.ShowMessage("Couldn't save log"))
                     }
+                }
+            }
+
+            is LogEvent.DeleteLog -> {
+                viewModelScope.launch {
+                    logUseCases.deleteLogById(event.id)
                 }
             }
         }
