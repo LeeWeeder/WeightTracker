@@ -6,20 +6,16 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.leeweeder.weighttracker.domain.model.Log
 import com.leeweeder.weighttracker.ui.home.daysOfTheWeek
 import com.leeweeder.weighttracker.ui.home.goalWeightKey
 import com.leeweeder.weighttracker.ui.util.format
@@ -69,8 +65,6 @@ import com.patrykandpatrick.vico.core.common.component.TextComponent
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import com.patrykandpatrick.vico.core.common.shape.Corner
 import com.patrykandpatrick.vico.core.common.shape.Shape
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
 import java.text.DecimalFormat
 import java.time.LocalDate
 import kotlin.math.roundToInt
@@ -78,32 +72,26 @@ import kotlin.math.roundToInt
 @Composable
 fun LineChart(
     modelProducer: CartesianChartModelProducer,
-    dataObserver: () -> Flow<List<Log>>,
+    dataObserver: () -> Unit,
     modifier: Modifier = Modifier,
     bottomAxis: HorizontalAxis<AxisPosition.Horizontal.Bottom> = rememberBottomAxis()
 ) {
-    val showPlaceholder = remember {
-        mutableStateOf(false)
-    }
     LaunchedEffect(Unit) {
-        dataObserver().collectLatest { showPlaceholder.value = it.isEmpty() }
+        dataObserver()
     }
-    Box(modifier = modifier) {
-        if (!showPlaceholder.value) {
-            CartesianChartHost(
-                chart = rememberLineChart(bottomAxis = bottomAxis),
-                modelProducer = modelProducer,
-                zoomState = rememberVicoZoomState(zoomEnabled = false),
-                scrollState = rememberVicoScrollState(scrollEnabled = false)
-            )
-        } else {
+    CartesianChartHost(
+        chart = rememberLineChart(bottomAxis = bottomAxis),
+        modelProducer = modelProducer,
+        modifier = modifier,
+        zoomState = rememberVicoZoomState(zoomEnabled = false),
+        scrollState = rememberVicoScrollState(scrollEnabled = false),
+        placeholder = {
             NoData(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
+                    .fillMaxSize()
             )
         }
-    }
+    )
 }
 
 @Composable
@@ -168,7 +156,8 @@ private fun rememberLineChart(
             scalableStartPaddingDp = 15f,
             scalableEndPaddingDp = 15f
         ),
-        marker = rememberMarker()
+        marker = rememberMarker(),
+        getXStep = { 1.0 }
     )
 }
 
