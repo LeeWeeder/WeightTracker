@@ -57,7 +57,6 @@ import com.leeweeder.weighttracker.ui.util.model.LineChartData
 import com.leeweeder.weighttracker.ui.util.model.WeekRange
 import com.leeweeder.weighttracker.util.Screen
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import kotlin.math.absoluteValue
@@ -109,7 +108,7 @@ fun HomeScreen(
 fun HomeScreen(
     uiState: HomeUiState,
     onWeightGoalSet: (weight: Int) -> Unit,
-    observeThisWeekLogsAndGoalWeight: () -> Flow<List<Log>>,
+    observeThisWeekLogsAndGoalWeight: () -> Unit,
     onEvent: (HomeEvent) -> Unit,
     modelProducer: CartesianChartModelProducer
 ) {
@@ -166,7 +165,7 @@ private fun HomeScreenContent(
     paddingValues: PaddingValues,
     showGoalScreen: () -> Unit,
     onLogItemLongClick: (Log) -> Unit,
-    observeThisWeekLogsAndGoalWeight: () -> Flow<List<Log>>,
+    observeThisWeekLogsAndGoalWeight: () -> Unit,
     modelProducer: CartesianChartModelProducer
 ) {
     Column(

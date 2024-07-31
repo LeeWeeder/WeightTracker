@@ -13,9 +13,7 @@ import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -44,7 +42,7 @@ class HomeViewModel @Inject constructor(
         get() = _modelProducer
 
     init {
-        getLogsForWeek()
+        getLogsForThisWeek()
         getLatestLogPair()
         viewModelScope.launch {
             dataStoreUseCases.readGoalWeightState().collectLatest { goalWeight ->
@@ -65,8 +63,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun observeThisWeekLogsAndGoalWeight(): Flow<List<com.leeweeder.weighttracker.domain.model.Log>> {
-        var flow = emptyFlow<List<com.leeweeder.weighttracker.domain.model.Log>>()
+    fun observeThisWeekLogsAndGoalWeight() {
         viewModelScope.launch {
             snapshotFlow {
                 homeUiState.value.logsForThisWeek
@@ -74,26 +71,21 @@ class HomeViewModel @Inject constructor(
                 .onEach {
                     loadLineChart()
                 }
-                .also {
-                    flow = it
-                }
                 .launchIn(viewModelScope)
 
             snapshotFlow { homeUiState.value.goalWeight }
                 .onEach { loadLineChart() }
                 .launchIn(viewModelScope)
         }
-        return flow
     }
 
     private fun loadLineChart() {
-        val originalData = homeUiState.value.logsForThisWeek.apply { if (isEmpty()) return }
-
         viewModelScope.launch {
+            val uiState = homeUiState.value
             val precedingDay =
-                logUseCases.getLogByDate(homeUiState.value.daysOfWeek.first().minusDays(1))
+                logUseCases.getLogByDate(uiState.daysOfWeek.first().minusDays(1))
 
-            val data = originalData.associate {
+            val data = uiState.logsForThisWeek.associate {
                 it.date to it.weight.value
             }.toMutableMap().also {
                 if (precedingDay != null) it[precedingDay.date] = precedingDay.weight.value
@@ -102,17 +94,17 @@ class HomeViewModel @Inject constructor(
             val xToDates = data.keys.associateBy { it.toEpochDay().toDouble() }
 
             _modelProducer.runTransaction {
+                if (data.isEmpty()) return@runTransaction
                 lineSeries {
                     series(
                         x = xToDates.keys,
                         y = data.values
                     )
                 }
-                Log.d("logsForThisWeek", "$data")
                 extras { extraStore ->
                     extraStore[goalWeightKey] = homeUiState.value.goalWeight.toDouble()
                     extraStore[daysOfWeeksWithValuesKey] =
-                        originalData.map {
+                        uiState.logsForThisWeek.map {
                             it.date.toEpochDay().toDouble()
                         }.toSet()
                     val currentLog = homeUiState.value.latestLogPair.currentLog
@@ -132,13 +124,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun getLogsForWeek() {
+    private fun getLogsForThisWeek() {
         getLogsForWeekJob?.cancel()
         getLogsForWeekJob = logUseCases.getLogsForThisWeek(homeUiState.value.today)
             .onEach { logs ->
                 _homeUiState.value = homeUiState.value.copy(
                     logsForThisWeek = logs
                 )
+                Log.d("getLogsForThisWeek", "$logs")
             }
             .launchIn(viewModelScope)
     }

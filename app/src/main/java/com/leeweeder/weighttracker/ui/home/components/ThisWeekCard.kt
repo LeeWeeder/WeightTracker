@@ -52,7 +52,6 @@ import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.core.common.Dimensions
 import com.patrykandpatrick.vico.core.common.shape.Shape
-import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -145,7 +144,7 @@ internal fun ThisWeekCard(
                         NoData(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 32.dp)
+                                .padding(bottom = 53.dp)
                         )
                     } else {
                         Column(modifier = Modifier.padding(top = 8.dp, bottom = 12.dp)) {
@@ -173,7 +172,7 @@ internal fun ThisWeekCard(
 @Composable
 private fun ThisWeekCardLineChart(
     modelProducer: CartesianChartModelProducer,
-    dataObserver: () -> Flow<List<Log>>
+    dataObserver: () -> Unit
 ) {
     class CircleBackgroundSpan(
         private val backgroundColor: Color?,
@@ -260,6 +259,7 @@ private fun ThisWeekCardLineChart(
         val colorScheme = MaterialTheme.colorScheme
         return remember {
             CartesianValueFormatter { x, chartValues, _ ->
+                android.util.Log.d("rememberBottomAxisValueFormatter", "$x")
                 val extraStore = chartValues.model.extraStore
                 val (backgroundColor, textColor, borderColor) = if (x == extraStore[currentLogDayOfTheWeek])
                     DayOfTheWeekIndicatorProperty(
