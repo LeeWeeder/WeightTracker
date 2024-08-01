@@ -14,11 +14,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import com.leeweeder.weighttracker.R
-import com.leeweeder.weighttracker.ui.util.format
+import com.leeweeder.weighttracker.ui.util.TextUtil
 import java.time.LocalDate
 
 @Composable
@@ -94,15 +91,8 @@ fun ConfirmDeleteLogAlertDialog(
     onDismissRequest: () -> Unit,
     onConfirm: (DeleteLogRequest?) -> Unit
 ) {
-    val builder = AnnotatedString.Builder()
-    builder.append("Are you sure you want to delete log for ")
-    val date = state.logToDelete?.date?.format("MM/d/yyyy") ?: "-"
-    builder.withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-        append(date)
-    }
-    builder.append("? This operation cannot be undone.")
-
-    val text = builder.toAnnotatedString()
+    val text = state.logToDelete?.date?.let { TextUtil.confirmDialogTextBuilder("delete log", it) }
+        ?: AnnotatedString("-")
 
     AlertDialog(
         visible = state.visible,
