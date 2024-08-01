@@ -147,7 +147,7 @@ internal fun AddEditLogScreen(
     AlertDialog(
         visible = isConfirmUpdateDialogVisible.value,
         onDismissRequest = { isConfirmUpdateDialogVisible.value = false },
-        title = "Continue update?",
+        title = "Update log?",
         text = text,
         confirmButton = {
             TextButton(onClick = {
