@@ -40,6 +40,7 @@ import com.leeweeder.weighttracker.ui.components.ConfirmDeleteLogAlertDialog
 import com.leeweeder.weighttracker.ui.components.DeleteLogRequest
 import com.leeweeder.weighttracker.ui.components.InvalidValueAlertDialog
 import com.leeweeder.weighttracker.ui.components.rememberConfirmDeleteLogAlertDialogState
+import com.leeweeder.weighttracker.ui.util.TextUtil
 import com.leeweeder.weighttracker.ui.util.format
 import com.leeweeder.weighttracker.util.Weight
 import com.leeweeder.weighttracker.util.toEpochMilli
@@ -141,11 +142,13 @@ internal fun AddEditLogScreen(
         mutableStateOf(false)
     }
 
+    val text = TextUtil.confirmDialogTextBuilder("update the weight", uiState.date)
+
     AlertDialog(
         visible = isConfirmUpdateDialogVisible.value,
         onDismissRequest = { isConfirmUpdateDialogVisible.value = false },
         title = "Continue update?",
-        text = "Are you sure to override the weight for this date (${uiState.date.format("MM/d/yyyy")})? This cannot be undone.",
+        text = text,
         confirmButton = {
             TextButton(onClick = {
                 saveLog()
