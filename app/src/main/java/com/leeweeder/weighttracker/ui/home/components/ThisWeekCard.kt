@@ -24,6 +24,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -67,7 +68,7 @@ internal fun ThisWeekCard(
         shape = MaterialTheme.shapes.large,
     ) {
         val segmentedButtonItems = SegmentedButtonItems.entries
-        val selectedIndex = remember {
+        val selectedIndex = rememberSaveable {
             mutableIntStateOf(SegmentedButtonItems.CHART.ordinal)
         }
         val navController = LocalNavController.current
