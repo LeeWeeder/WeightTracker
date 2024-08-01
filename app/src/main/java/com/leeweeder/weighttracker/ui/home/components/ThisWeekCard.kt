@@ -260,7 +260,6 @@ private fun ThisWeekCardLineChart(
         val colorScheme = MaterialTheme.colorScheme
         return remember {
             CartesianValueFormatter { x, chartValues, _ ->
-                android.util.Log.d("rememberBottomAxisValueFormatter", "$x")
                 val extraStore = chartValues.model.extraStore
                 val (backgroundColor, textColor, borderColor) = if (x == extraStore[currentLogDayOfTheWeek])
                     DayOfTheWeekIndicatorProperty(
