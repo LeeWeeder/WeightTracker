@@ -97,7 +97,7 @@ fun ConfirmDeleteLogAlertDialog(
     AlertDialog(
         visible = state.visible,
         onDismissRequest = onDismissRequest,
-        title = "Confirm delete?",
+        title = "Delete log?",
         text = text,
         confirmButton = {
             TextButton(
