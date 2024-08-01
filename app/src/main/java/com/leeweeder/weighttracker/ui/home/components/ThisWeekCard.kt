@@ -264,27 +264,27 @@ private fun ThisWeekCardLineChart(
                 val extraStore = chartValues.model.extraStore
                 val (backgroundColor, textColor, borderColor) = if (x == extraStore[currentLogDayOfTheWeek])
                     DayOfTheWeekIndicatorProperty(
-                        backgroundColor = colorScheme.secondary,
-                        textColor = colorScheme.onSecondary,
-                        borderColor = colorScheme.secondary
+                        backgroundColor = colorScheme.primary,
+                        textColor = colorScheme.onPrimary,
+                        borderColor = colorScheme.primary
                     )
                 else if (extraStore[daysOfWeeksWithValuesKey].contains(x))
                     DayOfTheWeekIndicatorProperty(
-                        backgroundColor = colorScheme.secondaryContainer,
-                        textColor = colorScheme.onSecondaryContainer,
-                        borderColor = colorScheme.secondaryContainer
+                        backgroundColor = colorScheme.primaryContainer,
+                        textColor = colorScheme.onPrimaryContainer,
+                        borderColor = colorScheme.primaryContainer
                     )
                 else if (x == LocalDate.now().toEpochDay().toDouble())
                     DayOfTheWeekIndicatorProperty(
                         backgroundColor = null,
-                        textColor = colorScheme.secondary,
-                        borderColor = colorScheme.secondary
+                        textColor = colorScheme.primary,
+                        borderColor = colorScheme.primary
                     )
                 else
                     DayOfTheWeekIndicatorProperty(
                         backgroundColor = null,
-                        textColor = colorScheme.secondary,
-                        borderColor = colorScheme.secondaryContainer
+                        textColor = colorScheme.onSurface,
+                        borderColor = colorScheme.outlineVariant
                     )
                 setSpan(
                     (chartValues.model.extraStore[xToDateMapKey][x] ?: LocalDate.ofEpochDay(
